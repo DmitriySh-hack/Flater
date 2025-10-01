@@ -1,0 +1,32 @@
+.header_container{
+    background-color: black;
+    color: white;
+    height: 50px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+    align-items: center;
+}
+
+.interactive-header{
+    display: flex;
+    list-style: none;
+    margin: 0;
+    gap: 50px;
+}
+
+.interactive-header li{
+    display: inline-block;
+    cursor: pointer;
+}
+
+.profile{
+    cursor: pointer;
+}
+
+.Logo{
+    width: 150px;
+    cursor: pointer;
+}
