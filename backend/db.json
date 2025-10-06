@@ -1,66 +1,19 @@
 {
   "users": [
     {
-      "id": "1758813822534",
-      "email": "sharp.dima322@gmail.com",
-      "password": "$2b$04$kWCzieuS2cd1g/.MFGxs8e6Uysn7cOUAea702tkUudEtFjQIjLwNC",
-      "activationLink": "13e42d30-4282-437e-964e-976d814190b5",
-      "isActivated": true
-    },
-    {
-      "id": "1758874075354",
-      "email": "sharp.dima@mail.ru",
-      "password": "$2b$04$94b.awAMMWr90RfxgQ25H.dNpJpTvos5AxZdnHrET3rQG08lZqoTq",
-      "activationLink": "e9c90008-25ce-4df8-9e63-dfa0585c129a",
-      "isActivated": true
-    },
-    {
-      "id": "1759230169716",
+      "id": "1759762209886",
       "email": "dima.shitikov@internet.ru",
-      "password": "$2b$04$gVH7pGkV7fCcj08TNV7p0epmH9ofepL851v3aJAYVPTST5QeWjYtC",
-      "activationLink": "7ba6ddec-a153-4717-9cfa-f4425896cd93"
+      "password": "$2b$04$.PylxFfLESYpGxVtGKYEqOmzAFqsLWyz9T.65bbGnP597xLks1ueK",
+      "activationLink": "9a70163b-7d88-4f63-bed0-a39f409dba14",
+      "firstName": "Дмитрий",
+      "lastName": "Шитиков",
+      "isActivated": true
     }
   ],
   "tokens": [
     {
-      "user": "1758813822534",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoYXJwLmRpbWEzMjJAZ21haWwuY29tIiwiaWQiOiIxNzU4ODEzODIyNTM0IiwiaWF0IjoxNzU4ODEzODIzLCJleHAiOjE3NjE0MDU4MjN9.KwdSPN7RsNX73TQiNUiKGyrqtnsHHW3ZR8vSx1HwIbo"
-    },
-    {
-      "user": "1758874075354",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoYXJwLmRpbWFAbWFpbC5ydSIsImlkIjoiMTc1ODg3NDA3NTM1NCIsImlhdCI6MTc1ODg3NDA3NiwiZXhwIjoxNzYxNDY2MDc2fQ.ksCq921-s2qMRFS0-fzQM9Y4dKIl03hOK8QIKeViGb0"
-    },
-    {
-      "user": "1758813822534",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoYXJwLmRpbWEzMjJAZ21haWwuY29tIiwiaWQiOiIxNzU4ODEzODIyNTM0IiwiaXNBY3RpdmF0ZWQiOnRydWUsImlhdCI6MTc1ODg4ODAyMSwiZXhwIjoxNzYxNDgwMDIxfQ.DseNjk8e_iSSqwxeW_2iA6-XZjB50EgHS3jMOaOirN8"
-    },
-    {
-      "user": "1758813822534",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoYXJwLmRpbWEzMjJAZ21haWwuY29tIiwiaWQiOiIxNzU4ODEzODIyNTM0IiwiaXNBY3RpdmF0ZWQiOnRydWUsImlhdCI6MTc1ODg4ODA3MCwiZXhwIjoxNzYxNDgwMDcwfQ.hBPrlxuWxad8miRKJiwS0RuFYwZbP5drEpTFwXtegYU"
-    },
-    {
-      "user": "1758813822534",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoYXJwLmRpbWEzMjJAZ21haWwuY29tIiwiaWQiOiIxNzU4ODEzODIyNTM0IiwiaXNBY3RpdmF0ZWQiOnRydWUsImlhdCI6MTc1OTIyOTk4MCwiZXhwIjoxNzYxODIxOTgwfQ.RrxcCsyhTSbJltWKZYCikHE-VeVOT1Cfw097dqYDau4"
-    },
-    {
-      "user": "1759230169716",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpbWEuc2hpdGlrb3ZAaW50ZXJuZXQucnUiLCJpZCI6IjE3NTkyMzAxNjk3MTYiLCJpYXQiOjE3NTkyMzAxNzAsImV4cCI6MTc2MTgyMjE3MH0.X8CqtoFKbQqSVLtPh8bd8kQ8D5bg_QwOqaW0iWZvZH4"
-    },
-    {
-      "user": "1759230169716",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpbWEuc2hpdGlrb3ZAaW50ZXJuZXQucnUiLCJpZCI6IjE3NTkyMzAxNjk3MTYiLCJpYXQiOjE3NTkyMzAxNzEsImV4cCI6MTc2MTgyMjE3MX0.E0ZYhn0DSJII5ddd4hsw_PJnNibHArRiz6rr_fTE4Zs"
-    },
-    {
-      "user": "1759230169716",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpbWEuc2hpdGlrb3ZAaW50ZXJuZXQucnUiLCJpZCI6IjE3NTkyMzAxNjk3MTYiLCJpYXQiOjE3NTkyMzAxNzMsImV4cCI6MTc2MTgyMjE3M30.m1ZM_wnPM990lm276rjA_rR2_Tt-IbPER7D2VoUBjCk"
-    },
-    {
-      "user": "1758813822534",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoYXJwLmRpbWEzMjJAZ21haWwuY29tIiwiaWQiOiIxNzU4ODEzODIyNTM0IiwiaXNBY3RpdmF0ZWQiOnRydWUsImlhdCI6MTc1OTIzOTU5MCwiZXhwIjoxNzYxODMxNTkwfQ.hrREZB99G2ZjyDzozeCN6NoL81RN1KU9Dh_7ah7GtQ8"
-    },
-    {
-      "user": "1759230169716",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpbWEuc2hpdGlrb3ZAaW50ZXJuZXQucnUiLCJpZCI6IjE3NTkyMzAxNjk3MTYiLCJpYXQiOjE3NTkzMDg4ODIsImV4cCI6MTc2MTkwMDg4Mn0.-hxYAxHScnK5Bp4b_T2BSClWhXBrz05en5BuZRG6NV0"
+      "userId": "1759762209886",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpbWEuc2hpdGlrb3ZAaW50ZXJuZXQucnUiLCJpZCI6IjE3NTk3NjIyMDk4ODYiLCJpc0FjdGl2YXRlZCI6dHJ1ZSwiZmlyc3ROYW1lIjoi0JTQvNC40YLRgNC40LkiLCJsYXN0TmFtZSI6ItCo0LjRgtC40LrQvtCyIiwiaWF0IjoxNzU5NzYyNjA0LCJleHAiOjE3NjIzNTQ2MDR9.-BaY5OpzVoxq3rFlVdxA8eR2o6Fq7RI035QTsFeFx5Y"
     }
   ]
 }

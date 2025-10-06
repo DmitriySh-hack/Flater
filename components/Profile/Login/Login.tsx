@@ -1,10 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
 import { Context } from '../../../src/main';
 import { observer } from 'mobx-react-lite';
+import { useNavigate } from 'react-router-dom';
 
 export const Login = observer(() => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+
+    const navigator = useNavigate();
 
     const {store} = useContext(Context)
 
@@ -12,12 +15,10 @@ export const Login = observer(() => {
         if(localStorage.getItem('token')){
             store.checkAuth()
         }
-    }, [])
+    })
 
     return (
         <div>
-            <h1>{store.isAuth ? `Пользователь авторизован ${store.user.email}` : 'Авторизуйтесь!'}</h1>
-
             <input 
             onChange={e => setEmail(e.target.value)}
             value={email}
@@ -28,12 +29,18 @@ export const Login = observer(() => {
             <input 
             onChange={e => setPassword(e.target.value)}
             value={password}
-            type='text' 
+            type='password' 
             placeholder='Пароль'
             />
 
-            <button onClick={() => store.login(email, password)}>Вход</button>
-            <button onClick={() => store.registration(email, password)}>Регистрация</button>
+            <button onClick={async () => {
+                await store.login(email, password);
+                if (store.isAuth) {
+                    navigator('/profile');
+                }
+             }}>Вход</button>
+             
+            <button onClick={() => navigator('/registration')}>Регистрация</button>
         </div>
     )
 });

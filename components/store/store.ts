@@ -2,7 +2,7 @@ import { makeAutoObservable } from "mobx";
 import type { IUSER } from "../models/IUser";
 import AuthService from "../service/AuthService";
 import axios from "axios";
-import { AuthResponse } from "../models/response/AuthResponse";
+import type { AuthResponse } from "../models/response/AuthResponse";
 import { API_URL } from "../http";
 
 export default class Store {
@@ -27,30 +27,42 @@ export default class Store {
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
             this.setUser(response.data.user)
-        }catch(e){
-            console.log(e.response?.data?.message)
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                console.log(e.response?.data?.message);
+            } else {
+                console.log('Ошибка');
+            }
         }
     }
 
-    async registration(email: string, password: string){
+    async registration(email: string, password: string, firstName: string, lastName: string){
         try{
-            const response = await AuthService.registration(email, password);
+            const response = await AuthService.registration(email, password, firstName, lastName);
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
             this.setUser(response.data.user)
-        }catch(e){
-            console.log(e.response?.data?.message)
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                console.log(e.response?.data?.message);
+            } else {
+                console.log('Ошибка');
+            }
         }
     }
 
     async logout(){
         try{
-            const response = await AuthService.logout();
+            await AuthService.logout();
             localStorage.removeItem('token')
             this.setAuth(false);
             this.setUser({} as IUSER);
-        }catch(e){
-            console.log(e.response?.data?.message)
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                console.log(e.response?.data?.message);
+            } else {
+                console.log('Ошибка');
+            }
         }
     }
 
@@ -61,8 +73,12 @@ export default class Store {
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
             this.setUser(response.data.user)
-        }catch (e) {
-            console.log(e.response?.data?.message)
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                console.log(e.response?.data?.message);
+            } else {
+                console.log('Ошибка');
+            }
         }
     }
 }

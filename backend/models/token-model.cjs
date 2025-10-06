@@ -20,6 +20,26 @@ const TokenModel = {
         return token;
     },
     
+    async updateOne(query, update){
+        const fs = require('fs');
+        const path = require('path');
+        const dbPath = path.join(__dirname, '../db.json');
+        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+        let updated = null;
+        db.tokens = db.tokens.map(token => {
+            const isMatch = (query.userId && token.userId === query.userId) || (query.refreshToken && token.refreshToken === query.refreshToken);
+            if(isMatch){
+                updated = { ...token, ...update };
+                return updated;
+            }
+            return token;
+        });
+        if(updated){
+            fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
+        }
+        return updated;
+    },
+    
     async deleteOne(query) {
         const fs = require('fs');
         const path = require('path');
