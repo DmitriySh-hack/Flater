@@ -12,4 +12,7 @@ router.get('/refresh', userController.refresh);
 
 router.get('/users', authMidddleware, userController.getUsers);
 
+router.put('/profile', authMidddleware, userController.updateProfile);
+router.put('/change-password', authMidddleware, userController.changePassword);
+
 module.exports = router

@@ -4,6 +4,8 @@ import AuthService from "../service/AuthService";
 import axios from "axios";
 import type { AuthResponse } from "../models/response/AuthResponse";
 import { API_URL } from "../http";
+import UserService from "../service/UserService";
+
 
 export default class Store {
     user = {} as IUSER
@@ -79,6 +81,35 @@ export default class Store {
             } else {
                 console.log('Ошибка');
             }
+        }
+    }
+
+    async updateProfile(update: Partial<Pick<IUSER, 'firstName' | 'lastName' | 'email'>>){
+        try{
+            const response = await UserService.updateProfile(update)
+            this.setUser(response.data.user)
+            return response.data.user
+        }catch(e: unknown){
+            if (axios.isAxiosError(e)) {
+                console.log(e.response?.data?.message);
+            } else {
+                console.log('Ошибка');
+            }
+            throw e;
+        }
+    }
+
+    async changePassword(oldPassword: string, newPassword: string){
+        try{
+            const response = await UserService.changePassword({oldPassword, newPassword})
+            return response.data.success
+        }catch(e: unknown){
+            if (axios.isAxiosError(e)) {
+                console.log(e.response?.data?.message);
+            } else {
+                console.log('Ошибка');
+            }
+            throw e;
         }
     }
 }

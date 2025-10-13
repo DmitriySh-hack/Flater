@@ -74,6 +74,28 @@ class UserController {
             next(e);
         }
     }
+
+    async updateProfile(req, res, next){
+        try{
+            const userId = req.user.id
+            const {firstName, lastName, email} = req.body
+            const updateDto = await userService.updateProfile(userId, {firstName, lastName, email})
+            return res.json({ user: updateDto })
+        }catch(e){
+            next(e)
+        }
+    }
+
+    async changePassword(req, res, next){
+        try{
+            const userId = req.user.id
+            const {oldPassword, newPassword} = req.body;
+            await userService.changePassword(userId, oldPassword, newPassword);
+            return res.json({success: true})
+        }catch(e){
+            next(e);
+        }
+    }
 }
 
 module.exports = new UserController()

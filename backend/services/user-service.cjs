@@ -89,9 +89,52 @@ class UserService{
         }
     }
 
-    async getAllUsers(){
+    async getAllUsers(userId, update){
         const users = await UserModel.findByIdAndUpdate();
         return users
+    }
+
+    async updateProfile(userId, update){
+        const changeVal = ['firstName', 'lastName', 'email']
+        const checkVal = {}
+
+        for (const key of changeVal) {
+            if (Object.prototype.hasOwnProperty.call(update, key) && update[key] !== undefined) {
+                checkVal[key] = update[key]
+            }
+        }
+
+        if (checkVal.email) {
+            const existing = await userModel.findOne({ email: checkVal.email })
+            if (existing && existing.id !== userId) {
+                throw ApiError.BadRequest('Пользователь с текущим email уже существует')
+            }
+        }
+
+        const updateUser = await userModel.findByIdAndUpdate(userId, checkVal)
+        if (!updateUser) {
+            throw ApiError.BadRequest('Пользователь не найден')
+        }
+
+        const userDto = new UserDto(updateUser)
+        return userDto
+    }
+
+    async changePassword(userId, oldPassword, newPassword){
+        const user = await userModel.findById(userId)
+        if(!user){
+            throw ApiError.BadRequest('Пользователь не найден')
+        }
+        const isPassEquals = await bcrypt.compare(oldPassword, user.password)
+        if(!isPassEquals){
+            throw ApiError.BadRequest('Старый пароль неверный')
+        }
+        if(!newPassword || String(newPassword).length < 6){
+            throw ApiError.BadRequest('Новый пароль слишком короткий')
+        }
+        const hashPassword = await bcrypt.hash(newPassword, 3)
+        await userModel.findByIdAndUpdate(userId, {password: hashPassword})
+        return true;
     }
 }
 
