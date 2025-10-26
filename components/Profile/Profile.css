@@ -5,3 +5,93 @@
     align-items: center;
 }
 
+.main-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.profile-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap:7px;
+    background-color: #e3dede;
+    padding: 15px;
+    border-radius: 15px;
+    width: 500px;
+}
+
+.saveChangesProfile{
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.profile-form input{
+    border-radius: 5px;
+    width: 300px;
+    margin: 5px;
+}
+
+.profile-form button{
+    margin: 3px;
+}
+
+.first-name .last-name .email{
+    margin: 10px;
+}
+
+.modal-overplay{
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-content{
+    background-color: #ffffff;
+    padding: 5px;
+    border-radius: 7px;
+    position: relative;
+    max-width: 480px;
+    width: 90%;
+}
+
+.modal-close{
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    border: none;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.modal-content .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 12px;
+}
+
+.modal-actions{
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+

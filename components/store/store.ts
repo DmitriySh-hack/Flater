@@ -112,4 +112,21 @@ export default class Store {
             throw e;
         }
     }
+
+    async uploadAvatar(file: File){
+        try{
+            const formData = new FormData();
+            formData.append('avatar', file)
+            const response = await UserService.uploadAvatar(formData);
+            this.setUser(response.data.user)
+            return response.data.user
+        }catch(e: unknown){
+            if (axios.isAxiosError(e)) {
+                console.log(e.response?.data?.message);
+            } else {
+                console.log('Ошибка');
+            }
+            throw e;
+        }
+    }
 }

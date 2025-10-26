@@ -14,4 +14,12 @@ export default class UserService{
     static changePassword(payload: {oldPassword: string, newPassword: string}) : Promise<AxiosResponse<{success: boolean}>>{
         return $api.put<{success: boolean}>('/change-password', payload)
     }
+
+    static uploadAvatar(formData: FormData): Promise<AxiosResponse<{user: IUSER}>>{
+        return $api.post<{ user: IUSER }>('/upload-avatar', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
 }
