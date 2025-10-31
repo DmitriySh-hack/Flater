@@ -1,52 +1,54 @@
+const { sql, query } = require('../db-mssql.cjs');
+
 const TokenModel = {
-    async findOne(query) {
-        const fs = require('fs');
-        const path = require('path');
-        const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf-8'));
-        return db.tokens.find(token => {
-            if(query.userId) return token.userId === query.userId;
-            if(query.refreshToken) return token.refreshToken === query.refreshToken;
-            return false;
-        });
+    async findOne(where) {
+        if (where.userId) {
+            const res = await query('SELECT TOP 1 * FROM dbo.[tokens] WHERE userId = @userId', [
+                { name: 'userId', type: sql.NVarChar, value: where.userId }
+            ]);
+            return res.recordset[0] || null;
+        } else if (where.refreshToken) {
+            const res = await query('SELECT TOP 1 * FROM dbo.[tokens] WHERE refreshToken = @refreshToken', [
+                { name: 'refreshToken', type: sql.NVarChar, value: where.refreshToken }
+            ]);
+            return res.recordset[0] || null;
+        }
+        return null;
     },
     
     async create(tokenData) {
-        const fs = require('fs');
-        const path = require('path');
-        const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf-8'));
-        const token = { ...tokenData };
-        db.tokens.push(token);
-        fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
-        return token;
+        const { userId, refreshToken } = tokenData;
+        await query('INSERT INTO dbo.[tokens] (userId, refreshToken) VALUES (@userId, @refreshToken)', [
+            { name: 'userId', type: sql.NVarChar, value: userId },
+            { name: 'refreshToken', type: sql.NVarChar, value: refreshToken }
+        ]);
+        return { userId, refreshToken };
     },
     
-    async updateOne(query, update){
-        const fs = require('fs');
-        const path = require('path');
-        const dbPath = path.join(__dirname, '../db.json');
-        const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
-        let updated = null;
-        db.tokens = db.tokens.map(token => {
-            const isMatch = (query.userId && token.userId === query.userId) || (query.refreshToken && token.refreshToken === query.refreshToken);
-            if(isMatch){
-                updated = { ...token, ...update };
-                return updated;
-            }
-            return token;
-        });
-        if(updated){
-            fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
+    async updateOne(where, update) {
+        if (where.userId) {
+            const res = await query('UPDATE dbo.[tokens] SET refreshToken = @refreshToken WHERE userId = @userId', [
+                { name: 'refreshToken', type: sql.NVarChar, value: update.refreshToken },
+                { name: 'userId', type: sql.NVarChar, value: where.userId }
+            ]);
+            if (res.rowsAffected[0] === 0) return null;
+            return await this.findOne({ userId: where.userId });
+        } else if (where.refreshToken) {
+            const res = await query('UPDATE dbo.[tokens] SET refreshToken = @newToken WHERE refreshToken = @oldToken', [
+                { name: 'newToken', type: sql.NVarChar, value: update.refreshToken },
+                { name: 'oldToken', type: sql.NVarChar, value: where.refreshToken }
+            ]);
+            if (res.rowsAffected[0] === 0) return null;
+            return await this.findOne({ refreshToken: update.refreshToken });
         }
-        return updated;
+        return null;
     },
     
-    async deleteOne(query) {
-        const fs = require('fs');
-        const path = require('path');
-        const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf-8'));
-        db.tokens = db.tokens.filter(token => token.refreshToken !== query.refreshToken);
-        fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
-        return { deletedCount: 1 };
+    async deleteOne(where) {
+        const res = await query('DELETE FROM dbo.[tokens] WHERE refreshToken = @refreshToken', [
+            { name: 'refreshToken', type: sql.NVarChar, value: where.refreshToken }
+        ]);
+        return { deletedCount: res.rowsAffected[0] || 0 };
     }
 };
 

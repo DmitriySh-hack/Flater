@@ -2,6 +2,7 @@ const userModel = require("../models/user-model.cjs");
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const mailService = require('./mail-service.cjs')
+const cloudinary = require('../cloudinary.cjs')
 const TokenService = require('./token-service.cjs');
 const tokenModel = require("../models/token-model.cjs");
 const tokenService = require("./token-service.cjs");
@@ -18,8 +19,14 @@ class UserService{
 
         const hashPassword = await bcrypt.hash(password, 3);
         const activationLink = uuid.v4();
-        const user = await userModel.create({email, password: hashPassword, activationLink, firstName, lastName, isActivated: false}) 
-        await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
+        const id = String(Date.now());
+        const user = await userModel.create({id, email, password: hashPassword, activationLink, firstName, lastName, isActivated: false}) 
+        try {
+            await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
+        } catch (e) {
+            // В dev режиме пропускаем сбой почты, чтобы не ломать регистрацию
+            console.warn('Mail send failed (ignored):', e && e.message ? e.message : e);
+        }
         
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({...userDto}) 
@@ -135,6 +142,28 @@ class UserService{
         const hashPassword = await bcrypt.hash(newPassword, 3)
         await userModel.findByIdAndUpdate(userId, {password: hashPassword})
         return true;
+    }
+
+    async updateAvatar(userId, file){
+        if(!file){
+            throw ApiError.BadRequest('Файл аватара не передан')
+        }
+        const upload = await cloudinary.uploader.upload_stream({ folder: 'avatars', resource_type: 'image' })
+        return await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream({ folder: 'avatars', resource_type: 'image' }, async (error, result) => {
+                if(error){
+                    return reject(ApiError.BadRequest('Ошибка загрузки аватара'))
+                }
+                try{
+                    const updated = await userModel.findByIdAndUpdate(userId, { avatarUrl: result.secure_url })
+                    const userDto = new UserDto(updated)
+                    resolve(userDto)
+                }catch(err){
+                    reject(err)
+                }
+            })
+            stream.end(file.buffer)
+        })
     }
 }
 

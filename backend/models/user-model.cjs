@@ -1,43 +1,61 @@
-const fs = require('fs');
-const path = require('path');
+const { sql, query } = require('../db-mssql.cjs');
 
 const UserModel = {
-    async findOne(query) {
-        const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf-8'));
-        return db.users.find(user => {
-            if(query.email){
-                return user.email === query.email;
-            }
-            if(query.activationLink){
-                return user.activationLink === query.activationLink;
-            }
-            return false;
-        });
-    },
-    
-    async create(userData) {
-        const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf-8'));
-        const user = { id: Date.now().toString(), ...userData };
-        db.users.push(user);
-        fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
-        return user;
-    },
-    
-    async findByIdAndUpdate(id, update) {
-        const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf-8'));
-        const userIndex = db.users.findIndex(user => user.id === id);
-        if(userIndex !== -1) {
-            db.users[userIndex] = { ...db.users[userIndex], ...update };
-            fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
-            return db.users[userIndex];
+    async findOne(where) {
+        if (where.email) {
+            const res = await query('SELECT TOP 1 id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl FROM dbo.[users] WHERE email = @email', [
+                { name: 'email', type: sql.NVarChar, value: where.email }
+            ]);
+            return res.recordset[0] || null;
+        } else if (where.activationLink) {
+            const res = await query('SELECT TOP 1 id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl FROM dbo.[users] WHERE activationLink = @activationLink', [
+                { name: 'activationLink', type: sql.NVarChar, value: where.activationLink }
+            ]);
+            return res.recordset[0] || null;
         }
         return null;
     },
+    
+    async create(userData) {
+        const { id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl } = userData;
+        await query(
+            `INSERT INTO dbo.[users] (id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl)
+             VALUES (@id, @email, @password, @firstName, @lastName, @activationLink, @isActivated, @avatarUrl)`,
+            [
+                { name: 'id', type: sql.NVarChar, value: id },
+                { name: 'email', type: sql.NVarChar, value: email },
+                { name: 'password', type: sql.NVarChar, value: password },
+                { name: 'firstName', type: sql.NVarChar, value: firstName },
+                { name: 'lastName', type: sql.NVarChar, value: lastName },
+                { name: 'activationLink', type: sql.NVarChar, value: activationLink },
+                { name: 'isActivated', type: sql.Bit, value: Boolean(isActivated) },
+                { name: 'avatarUrl', type: sql.NVarChar, value: avatarUrl || null }
+            ]
+        );
+        return await this.findById(id);
+    },
+    
+    async findByIdAndUpdate(id, update) {
+        const setClauses = [];
+        const params = [{ name: 'id', type: sql.NVarChar, value: id }];
+        if (update.firstName !== undefined) { setClauses.push('firstName = @firstName'); params.push({ name: 'firstName', type: sql.NVarChar, value: update.firstName }); }
+        if (update.lastName !== undefined)  { setClauses.push('lastName = @lastName');   params.push({ name: 'lastName',  type: sql.NVarChar, value: update.lastName }); }
+        if (update.email !== undefined)     { setClauses.push('email = @email');        params.push({ name: 'email',     type: sql.NVarChar, value: update.email }); }
+        if (update.password !== undefined)  { setClauses.push('password = @password');  params.push({ name: 'password',  type: sql.NVarChar, value: update.password }); }
+        if (update.isActivated !== undefined) { setClauses.push('isActivated = @isActivated'); params.push({ name: 'isActivated', type: sql.Bit, value: Boolean(update.isActivated) }); }
+        if (update.avatarUrl !== undefined) { setClauses.push('avatarUrl = @avatarUrl'); params.push({ name: 'avatarUrl', type: sql.NVarChar, value: update.avatarUrl }); }
+        if (setClauses.length === 0) {
+            return await this.findById(id);
+        }
+        await query(`UPDATE dbo.[users] SET ${setClauses.join(', ')} WHERE id = @id`, params);
+        return await this.findById(id);
+    },
 
     async findById(id) {
-        const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf-8'));
-        const user = db.users.find(user => user.id === id);
-        return user;
+        const res = await query('SELECT TOP 1 id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl FROM dbo.[users] WHERE id = @id', [
+            { name: 'id', type: sql.NVarChar, value: id }
+        ]);
+        return res.recordset[0] || null;
     }
 };
 

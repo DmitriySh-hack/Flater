@@ -96,6 +96,17 @@ class UserController {
             next(e);
         }
     }
+
+    async uploadAvatar(req, res, next){
+        try{
+            const userId = req.user.id
+            const file = req.file
+            const result = await userService.updateAvatar(userId, file)
+            return res.json({ user: result })
+        }catch(e){
+            next(e)
+        }
+    }
 }
 
 module.exports = new UserController()
