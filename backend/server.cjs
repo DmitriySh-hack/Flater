@@ -7,9 +7,9 @@ const errorMiddleware = require('./middleware/error-middleware.cjs');
 const { getPool } = require('./db-mssql.cjs');
 
 const PORT = process.env.PORT || 5000
-//
 
 const app = express();
+const path = require('path');
 
 app.use(express.json());
 app.use(cookieParser());
@@ -17,12 +17,12 @@ app.use(cors({
     credentials: true,
     origin: process.env.CLIENT_URL
 }));
+
+// Раздача статических файлов (аватарок)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use('/api', router);
 app.use(errorMiddleware);
-
-app.get('/', (req, res) => {
-    return res.json("Hello")
-})
 
 app.get('/users', (req, res) => {
     return res.json({ ok: true })
@@ -30,7 +30,6 @@ app.get('/users', (req, res) => {
 
 const start = async () => {
     try{
-        // initialize MSSQL pool (throws if connection fails)
         await getPool();
         app.listen(PORT, () => console.log(`Server ${PORT} started`))
     }catch (error){

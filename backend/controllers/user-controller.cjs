@@ -101,9 +101,14 @@ class UserController {
         try{
             const userId = req.user.id
             const file = req.file
+            if(!file){
+                return next(ApiError.BadRequest('Файл не был загружен'))
+            }
+            console.log('Uploading avatar for user:', userId, 'File size:', file.size, 'File type:', file.mimetype)
             const result = await userService.updateAvatar(userId, file)
             return res.json({ user: result })
         }catch(e){
+            console.error('Error in uploadAvatar:', e)
             next(e)
         }
     }

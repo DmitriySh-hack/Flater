@@ -2,12 +2,13 @@ const userModel = require("../models/user-model.cjs");
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const mailService = require('./mail-service.cjs')
-const cloudinary = require('../cloudinary.cjs')
 const TokenService = require('./token-service.cjs');
 const tokenModel = require("../models/token-model.cjs");
 const tokenService = require("./token-service.cjs");
 const UserDto = require('../dtos/user-dtos.cjs');
 const ApiError = require('../exceptions/api-error.cjs');
+const fs = require('fs').promises;
+const path = require('path');
 
 
 class UserService{
@@ -148,22 +149,59 @@ class UserService{
         if(!file){
             throw ApiError.BadRequest('Файл аватара не передан')
         }
-        const upload = await cloudinary.uploader.upload_stream({ folder: 'avatars', resource_type: 'image' })
-        return await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream({ folder: 'avatars', resource_type: 'image' }, async (error, result) => {
-                if(error){
-                    return reject(ApiError.BadRequest('Ошибка загрузки аватара'))
+        
+        try {
+            // Создаем папку для аватарок, если её нет
+            const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
+            await fs.mkdir(uploadsDir, { recursive: true });
+            
+            // Получаем старое имя файла аватара пользователя, если есть
+            const user = await userModel.findById(userId);
+            if (!user) {
+                throw ApiError.BadRequest('Пользователь не найден');
+            }
+            
+            // Удаляем старый аватар, если он существует
+            if (user.avatarUrl) {
+                const oldAvatarPath = path.join(__dirname, '..', user.avatarUrl);
+                try {
+                    await fs.unlink(oldAvatarPath);
+                } catch (err) {
+                    // Игнорируем ошибку, если файл не существует
+                    console.log('Старый аватар не найден для удаления:', oldAvatarPath);
                 }
-                try{
-                    const updated = await userModel.findByIdAndUpdate(userId, { avatarUrl: result.secure_url })
-                    const userDto = new UserDto(updated)
-                    resolve(userDto)
-                }catch(err){
-                    reject(err)
-                }
-            })
-            stream.end(file.buffer)
-        })
+            }
+            
+            // Генерируем уникальное имя файла
+            const fileExt = path.extname(file.originalname) || '.jpg';
+            const fileName = `${userId}_${Date.now()}${fileExt}`;
+            const filePath = path.join(uploadsDir, fileName);
+            
+            // Сохраняем файл
+            await fs.writeFile(filePath, file.buffer);
+            
+            // Формируем URL относительно корня backend
+            const avatarUrl = `/uploads/avatars/${fileName}`;
+            
+            // Сохраняем путь в базе данных
+            const updated = await userModel.findByIdAndUpdate(userId, { avatarUrl });
+            if (!updated) {
+                // Если обновление не удалось, удаляем сохраненный файл
+                await fs.unlink(filePath);
+                throw ApiError.BadRequest('Не удалось обновить профиль пользователя');
+            }
+            
+            const userDto = new UserDto(updated);
+            console.log('Avatar uploaded successfully for user:', userId, 'Path:', avatarUrl);
+            return userDto;
+            
+        } catch (err) {
+            console.error('Avatar upload error:', err);
+            if (err instanceof ApiError) {
+                throw err;
+            }
+            throw ApiError.BadRequest('Ошибка при сохранении аватара: ' + err.message);
+        }
     }
 }
 
