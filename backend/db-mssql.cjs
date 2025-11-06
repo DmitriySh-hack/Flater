@@ -1,5 +1,6 @@
 const sql = require('mssql/msnodesqlv8');
 
+//конфинг данных о БД
 const config = {
     server: 'DESKTOP-B510029\\SQLEXPRESS',
     database: 'flater_db',
@@ -16,6 +17,7 @@ const config = {
 
 let poolPromise;
 
+//Соединение с базой данных
 function getPool() {
     if (!poolPromise) {
         poolPromise = new sql.ConnectionPool(config)
@@ -29,6 +31,7 @@ function getPool() {
     return poolPromise;
 }
 
+//Функция выполнения SQL запроса
 async function query(text, inputs = []) {
     const pool = await getPool();
     const request = pool.request();

@@ -1,6 +1,8 @@
 const { sql, query } = require('../db-mssql.cjs');
 
 const UserModel = {
+
+    //Поиск пользователя по Email для авторизации
     async findOne(where) {
         if (where.email) {
             const res = await query('SELECT TOP 1 id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl FROM dbo.[users] WHERE email = @email', [
@@ -16,6 +18,7 @@ const UserModel = {
         return null;
     },
     
+    //Создание пользлвателя
     async create(userData) {
         const { id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl } = userData;
         await query(
@@ -35,6 +38,7 @@ const UserModel = {
         return await this.findById(id);
     },
     
+    //Изменение данных о пользователе, ориентируясь на его id, который неизменный
     async findByIdAndUpdate(id, update) {
         const setClauses = [];
         const params = [{ name: 'id', type: sql.NVarChar, value: id }];
@@ -51,6 +55,7 @@ const UserModel = {
         return await this.findById(id);
     },
 
+    //Поиск пользователя по id
     async findById(id) {
         const res = await query('SELECT TOP 1 id, email, password, firstName, lastName, activationLink, isActivated, avatarUrl FROM dbo.[users] WHERE id = @id', [
             { name: 'id', type: sql.NVarChar, value: id }

@@ -18,7 +18,6 @@ app.use(cors({
     origin: process.env.CLIENT_URL
 }));
 
-// Раздача статических файлов (аватарок)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api', router);
@@ -30,7 +29,7 @@ app.get('/users', (req, res) => {
 
 const start = async () => {
     try{
-        await getPool();
+        await getPool();//Соединение с БД при запуске бэка
         app.listen(PORT, () => console.log(`Server ${PORT} started`))
     }catch (error){
         console.log(error)  

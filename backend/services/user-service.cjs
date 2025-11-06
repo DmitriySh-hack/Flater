@@ -81,7 +81,7 @@ class UserService{
         }
         const userData = tokenService.validateRefreshToken(refreshToken);
         const tokenFromDB = await tokenService.findToken(refreshToken);
-        if(!userData || ! tokenFromDB){
+        if(!userData || !tokenFromDB){
             throw ApiError.UnathorizedError();
         }
 
@@ -95,11 +95,6 @@ class UserService{
             ...tokens,
             user: userDto
         }
-    }
-
-    async getAllUsers(userId, update){
-        const users = await UserModel.findByIdAndUpdate();
-        return users
     }
 
     async updateProfile(userId, update){
