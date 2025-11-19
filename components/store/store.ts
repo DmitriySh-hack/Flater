@@ -10,9 +10,11 @@ import UserService from "../service/UserService";
 export default class Store {
     user = {} as IUSER
     isAuth = false;
+    isLoading = true;
     
     constructor() {
         makeAutoObservable(this);
+        this.initializeAuth();
     }
 
     setAuth(bool: boolean){
@@ -21,6 +23,18 @@ export default class Store {
 
     setUser(user: IUSER){
         this.user = user;
+    }
+    
+
+    async initializeAuth() {
+        try{
+             const token = localStorage.getItem('token');
+            if (token) {
+                await this.checkAuth();
+            }
+        }catch(error){
+            console.log('Ошибка инициализации аутентификации', error);
+        }
     }
 
     async login(email: string, password: string){

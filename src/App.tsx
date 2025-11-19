@@ -3,7 +3,7 @@ import HomePage from '../components/Home/HomePage'
 import HeaderSide from '../components/Header/Header'
 import {Profile} from '../components/Profile/Profile'
 import Footer from '../components/Footer/Footer'
-import Advertisment from '../components/CreateAd/Advertisment'
+import { Advertisment } from '../components/CreateAd/Advertisment'
 import { Login } from '../components/Profile/Login/Login'
 import {Registration} from '../components/Profile/Register/Registration'
 
