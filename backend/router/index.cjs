@@ -1,5 +1,6 @@
 const Router = require('express').Router;
 const userController = require('../controllers/user-controller.cjs')
+const advertisementController = require('../advertisement/advertisment-controller.cjs')
 const router = new Router();
 const {body} = require('express-validator')
 const authMidddleware = require('../middleware/auth-middleware.cjs');
@@ -35,5 +36,12 @@ router.get('/refresh', userController.refresh);
 router.put('/profile', authMidddleware, userController.updateProfile);
 router.put('/change-password', authMidddleware, userController.changePassword);
 router.post('/upload-avatar', authMidddleware, upload.single('avatar'), userController.uploadAvatar);
+
+//Добавление объявления
+router.post('/advertisements', authMidddleware, advertisementController.createAdvertisement);
+router.get('/advertisements', authMidddleware, advertisementController.getUserAdvertisements);
+router.get('/advertisements/count', authMidddleware, advertisementController.getAdvertisementsCount);
+router.put('/advertisements/:id', authMidddleware, advertisementController.updateAdvertisement);
+router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);
 
 module.exports = router

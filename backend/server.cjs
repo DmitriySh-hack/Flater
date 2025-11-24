@@ -6,7 +6,7 @@ const router = require('./router/index.cjs')
 const errorMiddleware = require('./middleware/error-middleware.cjs');
 const { getPool } = require('./db-mssql.cjs');
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5001
 
 const app = express();
 const path = require('path');
@@ -32,7 +32,7 @@ const start = async () => {
         await getPool();//Соединение с БД при запуске бэка
         app.listen(PORT, () => console.log(`Server ${PORT} started`))
     }catch (error){
-        console.log(error)  
+        process.exit(1)
     }
 }
 

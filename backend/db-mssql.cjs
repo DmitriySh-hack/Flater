@@ -25,6 +25,7 @@ function getPool() {
             .then(pool => pool)
             .catch(err => {
                 poolPromise = undefined;
+                console.log('PuPuPu')
                 throw err;
             });
     }

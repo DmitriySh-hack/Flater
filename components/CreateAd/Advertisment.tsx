@@ -3,6 +3,7 @@ import { useContext, useState } from 'react';
 import { Context } from '../../src/main';
 import { useNavigate } from 'react-router-dom';
 import { CreateAdvirtisment } from './CreateAdvertismentModal/Modal'
+import './Advertisment.css'
 
 export const Advertisment = observer(() => {
     const navigate = useNavigate()
@@ -21,8 +22,8 @@ export const Advertisment = observer(() => {
 
     if(store.isAuth){
         return(
-            <div>
-                <div>Список Ваших объявлений: {counter}</div>
+            <div className='main-container'>
+                <div style={{fontSize: '18px'}}>Список Ваших объявлений: {counter}</div>
 
 
                 <button onClick={() => setOpenModal(true)}>Создать объявление</button>
@@ -31,7 +32,6 @@ export const Advertisment = observer(() => {
                     isClose = {handleCloseAd}
                     onCreate= {handleCreateAd}
                 />
-                
             </div>
         )
 
@@ -39,9 +39,9 @@ export const Advertisment = observer(() => {
     }
 
     return (
-        <div>
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', fontSize: '24px'}}>
             <div>Войдите в аккаунт</div>
-            <button onClick={() => {navigate('/login')}}></button>
+            <button onClick={() => {navigate('/login')}}>Войти</button>
         </div>
     )
 })

@@ -23,3 +23,16 @@ CREATE INDEX IX_tokens_userId ON dbo.[tokens](userId);
 CREATE INDEX IX_tokens_refreshToken ON dbo.[tokens](refreshToken);
 
 ALTER TABLE dbo.[users] ADD avatarUrl NVARCHAR(500) NULL;
+
+CREATE TABLE advertisements (
+    id NVARCHAR(255) PRIMARY KEY,
+    user_id NVARCHAR(50) NOT NULL,
+    title NVARCHAR(255) NOT NULL,
+    price DECIMAL(18,2) NOT NULL,
+    city NVARCHAR(100) NOT NULL,
+    street NVARCHAR(100) NOT NULL,
+    countOfRooms INT NOT NULL,
+    images NVARCHAR(MAX),
+    created_at DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);

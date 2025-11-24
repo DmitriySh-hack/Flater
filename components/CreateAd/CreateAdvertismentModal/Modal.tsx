@@ -45,6 +45,11 @@ export const CreateAdvirtisment = ({
                     <input
                         style={{marginBottom: '30px'}}
                     />
+
+                    <div>Цена:</div>
+                    <input
+                        style={{marginBottom: '30px'}}
+                    />
                 </div>
                 
 
