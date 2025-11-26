@@ -38,10 +38,10 @@ router.put('/change-password', authMidddleware, userController.changePassword);
 router.post('/upload-avatar', authMidddleware, upload.single('avatar'), userController.uploadAvatar);
 
 //Добавление объявления
-router.post('/advertisements', authMidddleware, advertisementController.createAdvertisement);
-router.get('/advertisements', authMidddleware, advertisementController.getUserAdvertisements);
-router.get('/advertisements/count', authMidddleware, advertisementController.getAdvertisementsCount);
-router.put('/advertisements/:id', authMidddleware, advertisementController.updateAdvertisement);
+router.post('/advertisements', authMidddleware, advertisementController.createAdvertisment);
+router.get('/advertisements', authMidddleware, advertisementController.getAdvertismentUser);
+router.get('/advertisements/count', authMidddleware, advertisementController.getCounterOfAdvertisment);
+router.put('/advertisements/:id', authMidddleware, advertisementController.getUpdateForAdvertisment);
 router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);
 
 module.exports = router

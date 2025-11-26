@@ -13,8 +13,8 @@ const AdvertismentModel = {
     
     async create(advert){
         const { id, title, price, city, street, countOfRooms, images, userId } = advert
-        await query(`INSERT INTO advertisements (id, title, price, city, street, countOfRooms, images, userId) 
-             VALUES (@id, @title, @price, @city, @street, @countOfRooms, @images, @userId GETDATE())`,
+        await query(`INSERT INTO advertisements (id, title, price, city, street, countOfRooms, images, user_id) 
+             VALUES (@id, @title, @price, @city, @street, @countOfRooms, @images, @userId )`,
             [
                 { name: 'id', type: sql.NVarChar, value: id },
                 { name: 'userId', type: sql.NVarChar, value: userId },

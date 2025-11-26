@@ -1,4 +1,4 @@
-const AdvertismentService = ('./advertisment-service.cjs')
+const AdvertismentService = require('./advertisment-service.cjs')
 const ApiError = require('../exceptions/api-error.cjs');
 
 class AdvertisementController{
@@ -27,7 +27,7 @@ class AdvertisementController{
         try{
             const userId = req.user.id
             const result = await AdvertismentService.getCounterOfAdvertisment(userId)
-            return res.json({result});
+            return res.json({count: result});
         }catch(e){
             next(e)
         }
@@ -36,9 +36,9 @@ class AdvertisementController{
     async getUpdateForAdvertisment(req, res, next){
         try{
             const userId = req.user.id;
-            const { adId } = req.params;
+            const { id } = req.params;
             const updateData = req.body;
-            const result = await AdvertismentService.getUpdateForAdvertisment(userId, adId, )
+            const result = await AdvertismentService.getUpdateForAdvertisment(userId, id, updateData)
             return res.json(result);
         }catch(e){
             next(e)
@@ -49,7 +49,7 @@ class AdvertisementController{
         try {
             const userId = req.user.id;
             const { id } = req.params;
-            const result = await advertisementService.deleteAdvertisement(userId, id);
+            const result = await AdvertismentService.deleteAdvertisment(userId, id);
             return res.json(result);
         } catch (e) {
             next(e);

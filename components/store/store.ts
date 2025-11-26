@@ -1,16 +1,35 @@
 import { makeAutoObservable } from "mobx";
 import type { IUSER } from "../models/IUser";
 import AuthService from "../service/AuthService";
-import axios from "axios";
+import $api from "../http";
 import type { AuthResponse } from "../models/response/AuthResponse";
-import { API_URL } from "../http";
 import UserService from "../service/UserService";
+import type { IADVERTISMENT } from "../models/IAdventisment";
 
+interface AdvertismentState{
+    advertisments: IADVERTISMENT[],//Массив объявлений
+    advertismentCount: number;
+    error: string | null;
+}
+
+interface AxiosError {
+    response?: {
+        data?: {
+            message: string;
+        };
+    };
+}
 
 export default class Store {
     user = {} as IUSER
     isAuth = false;
     isLoading = true;
+
+    advertisment: AdvertismentState = {
+        advertisments: [],
+        advertismentCount: 0,
+        error: null,
+    }
     
     constructor() {
         makeAutoObservable(this);
@@ -24,7 +43,44 @@ export default class Store {
     setUser(user: IUSER){
         this.user = user;
     }
-    
+
+    setAdvertisment(ads: IADVERTISMENT[]){
+        this.advertisment.advertisments = ads;
+    }
+
+    setCountOfAdvertisment(count: number){
+        this.advertisment.advertismentCount = count;
+    }
+
+    addAdvertisment(ad: IADVERTISMENT){
+        this.advertisment.advertisments.unshift(ad);
+        this.advertisment.advertismentCount++;
+    }
+
+    removeAdvertisment(adId: string){
+        this.advertisment.advertisments = this.advertisment.advertisments.filter(ad => ad.id !== adId)
+        this.advertisment.advertismentCount--;
+    }
+
+    setAdvertisementError(e: string | null){
+        this.advertisment.error = e;
+    }
+
+    get userAdvertisment(){
+        return this.advertisment.advertisments;
+    }
+
+    get advertismentCount(){
+        return this.advertisment.advertismentCount;
+    }
+
+    get hasAdvertisment(){
+        return this.advertisment.advertismentCount > 0;
+    }
+
+    get advertismentError(){
+        return this.advertisment.error;
+    }
 
     async initializeAuth() {
         try{
@@ -43,12 +99,12 @@ export default class Store {
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
             this.setUser(response.data.user)
-        } catch (e: unknown) {
-            if (axios.isAxiosError(e)) {
-                console.log(e.response?.data?.message);
-            } else {
-                console.log('Ошибка');
-            }
+
+            await this.getAdvertismentCount();
+            await this.getUserAdvertisments();
+
+        } catch (e) {
+            console.log('Ошибка входа:', e);
         }
     }
 
@@ -58,12 +114,8 @@ export default class Store {
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
             this.setUser(response.data.user)
-        } catch (e: unknown) {
-            if (axios.isAxiosError(e)) {
-                console.log(e.response?.data?.message);
-            } else {
-                console.log('Ошибка');
-            }
+        } catch (e) {
+            console.log('Ошибка регистрации:', e);
         }
     }
 
@@ -73,28 +125,27 @@ export default class Store {
             localStorage.removeItem('token')
             this.setAuth(false);
             this.setUser({} as IUSER);
-        } catch (e: unknown) {
-            if (axios.isAxiosError(e)) {
-                console.log(e.response?.data?.message);
-            } else {
-                console.log('Ошибка');
-            }
+
+            this.setAdvertisment([]);
+            this.setCountOfAdvertisment(0);
+
+        } catch (e) {
+            console.log('Ошибка выхода:', e);
         }
     }
 
     async checkAuth(){
         try{
-            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {withCredentials: true});
+            const response = await $api.get<AuthResponse>(`/refresh`);
             console.log(response)
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
             this.setUser(response.data.user)
-        } catch (e: unknown) {
-            if (axios.isAxiosError(e)) {
-                console.log(e.response?.data?.message);
-            } else {
-                console.log('Ошибка');
-            }
+
+            await this.getAdvertismentCount();
+            await this.getUserAdvertisments();
+        } catch (e) {
+            console.log('Ошибка проверки аутентификации:', e);
         }
     }
 
@@ -103,12 +154,8 @@ export default class Store {
             const response = await UserService.updateProfile(update)
             this.setUser(response.data.user)
             return response.data.user
-        }catch(e: unknown){
-            if (axios.isAxiosError(e)) {
-                console.log(e.response?.data?.message);
-            } else {
-                console.log('Ошибка');
-            }
+        }catch(e){
+            console.log('Ошибка обновления профиля:', e);
             throw e;
         }
     }
@@ -117,12 +164,8 @@ export default class Store {
         try{
             const response = await UserService.changePassword({oldPassword, newPassword})
             return response.data.success
-        }catch(e: unknown){
-            if (axios.isAxiosError(e)) {
-                console.log(e.response?.data?.message);
-            } else {
-                console.log('Ошибка');
-            }
+        }catch(e){
+            console.log('Ошибка смены пароля:', e);
             throw e;
         }
     }
@@ -134,12 +177,119 @@ export default class Store {
             const response = await UserService.uploadAvatar(formData);
             this.setUser(response.data.user)
             return response.data.user
+        }catch(e){
+            console.log('Ошибка загрузки аватара:', e);
+            throw e;
+        }
+    }
+
+    async createAdvertisment(adData: Omit<IADVERTISMENT, 'id' | 'userId'>){
+        try{
+            const response = await $api.post(`/advertisements`, adData);
+            this.addAdvertisment(response.data)
+            return response.data;
         }catch(e: unknown){
-            if (axios.isAxiosError(e)) {
-                console.log(e.response?.data?.message);
+            let errorMessage = 'Ошибка при загрузке объявлений';
+            const axiosError = e as AxiosError;
+            
+            if (axiosError.response?.data?.message) {
+                errorMessage = axiosError.response.data.message;
+                console.log(axiosError.response.data.message);
             } else {
-                console.log('Ошибка');
+                console.log('Ошибка загрузки объявлений:', e);
             }
+            
+            this.setAdvertisementError(errorMessage);
+            throw e;
+        }
+    }
+
+    async getAdvertismentCount(){
+        if (!this.isAuth) return;
+
+        try{
+            const response = await $api.get(`/advertisements/count`);
+            this.setCountOfAdvertisment(response.data.count)
+            return response.data.count;
+        }catch(e: unknown){
+            let errorMessage = 'Ошибка получения количества объявлений'
+            const axiosError = e as AxiosError;
+
+            if (axiosError.response?.data?.message) {
+                errorMessage = axiosError.response.data.message;
+                console.log(axiosError.response.data.message);
+            } else {
+                console.log('Ошибка загрузки объявлений:', e);
+            }
+            
+            this.setAdvertisementError(errorMessage);
+            throw e;
+        }
+    }
+
+    async getUserAdvertisments(){
+        if (!this.isAuth) return;
+
+        try{
+            const response = await $api.get(`/advertisements`);
+            this.setAdvertisment(response.data)
+            return response.data
+        }catch(e: unknown){
+            let errorMessage = 'Ошибка получения количества объявлений'
+            const axiosError = e as AxiosError;
+
+            if (axiosError.response?.data?.message) {
+                errorMessage = axiosError.response.data.message;
+                console.log(axiosError.response.data.message);
+            } else {
+                console.log('Ошибка загрузки объявлений:', e);
+            }
+            
+            this.setAdvertisementError(errorMessage);
+            throw e;
+        }
+    }
+
+    async updateAdvertisment(adId: string, updateData: Partial<IADVERTISMENT>){
+        try{
+            const response = await $api.put(`/advertisements/${adId}`, updateData);
+            const updateAds = this.advertisment.advertisments.map(ad => ad.id === adId ? {...ad, ...updateData} : ad);
+            this.setAdvertisment(updateAds)
+            return response.data
+        }catch(e: unknown){
+            let errorMessage = 'Ошибка получения количества объявлений'
+            const axiosError = e as AxiosError;
+
+            if (axiosError.response?.data?.message) {
+                errorMessage = axiosError.response.data.message;
+                console.log(axiosError.response.data.message);
+            } else {
+                console.log('Ошибка загрузки объявлений:', e);
+            }
+            
+            this.setAdvertisementError(errorMessage);
+            throw e;
+            
+        }
+    }
+
+    async deleteAdvertisment(adId: string){
+        try{
+            await $api.delete(`/advertisements/${adId}`);
+            this.removeAdvertisment(adId)
+            return true;
+        }catch(e: unknown){
+             let errorMessage = 'Ошибка при загрузке объявлений';
+             const axiosError = e as AxiosError;
+            
+            if (axiosError.response?.data?.message) {
+                errorMessage = axiosError.response.data.message;
+                console.log(axiosError.response.data.message);
+            } else {
+                console.log('Ошибка загрузки объявлений:', e);
+            }
+                        
+            this.setAdvertisementError(errorMessage);
             throw e;
         }
     }

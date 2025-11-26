@@ -61,7 +61,7 @@ class AdvertismentService{
             throw ApiError.BadRequest('Нет прав для удаления этого объявления');
         }
 
-        await AdvertisementModel.deleteById(adId);
+        await AdvertismentModel.deleteById(adId);
         return { success: true };
     }
 }
