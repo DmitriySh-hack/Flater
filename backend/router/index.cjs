@@ -40,7 +40,6 @@ router.post('/upload-avatar', authMidddleware, upload.single('avatar'), userCont
 //Добавление объявления
 router.post('/advertisements', authMidddleware, advertisementController.createAdvertisment);
 router.get('/advertisements', authMidddleware, advertisementController.getAdvertismentUser);
-router.get('/advertisements/count', authMidddleware, advertisementController.getCounterOfAdvertisment);
 router.put('/advertisements/:id', authMidddleware, advertisementController.getUpdateForAdvertisment);
 router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);
 

@@ -1,5 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import { IADVERTISMENT } from "../models/IAdventisment";
+import './cardOfFlar.css'
+import { useState, useContext } from 'react';
+import { Context } from '../../src/main';
 
 interface CardOfFlatProps {
     advertisement: IADVERTISMENT
@@ -7,33 +10,49 @@ interface CardOfFlatProps {
 
 export const CardOfFlat = observer((props: CardOfFlatProps) => {
     const {advertisement} = props;
-    const { title, price, city, street, countOfRooms, images } = advertisement
+    const { id, title, price, city, street, countOfRooms, images } = advertisement
+    const {store} = useContext(Context)
+
+    const [image, setImage] = useState(false)
+    const defaultPhoto = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png?20210118073241'
+
+    const currentImage = (images && images.length > 0 && !image) ? images[0] : defaultPhoto;
+
+    const handleDeleteAd = async () => {
+        try{
+            await store.deleteAdvertisment(id)
+        }catch(error){
+            console.log('Удаление не удалось: ', error)
+        }
+    }
 
     return (
-        <div>
-            <div>
+        <div className='flar-card__container'>
+            <div className='flat-card__up-container'>
                 <div className="flat-card__image">
-                {images && images.length > 0 ? (
-                    <img src={images[0]} alt={title} />
-                ) : (
-                    <div className="flat-card__no-image">Фото</div>
-                )}
+                    <img 
+                        src={currentImage}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={() => setImage(true)}
+                    />
+                </div>
+                
+                <div className='flat-card__title'>
+                    <h3>{title}</h3>
+                    <p>{price.toLocaleString('ru-RU')} ₽</p>
                 </div>
             </div>
 
-            <div>
-                <h3>{title}</h3>
-                <p>{price.toLocaleString('ru-RU')} ₽</p>
-            </div>
+            
 
-            <div>
+            <div className='flat-card__info'>
                 <span>Комнат: {countOfRooms}</span>
                 <span>Адрес: {city}, {street}</span>
             </div>
 
-            <div>
-                <button>Редактировать</button>
-                <button>Удалить</button>
+            <div className='flat-card__rebuilder'>
+                <button style={{margin: '5px'}}>Редактировать</button>
+                <button onClick={handleDeleteAd} style={{margin: '5px'}}>Удалить</button>
             </div>
         </div>
     )

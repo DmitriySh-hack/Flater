@@ -61,9 +61,9 @@ const AdvertismentModel = {
 
     async deleteById(id){
         const res = await query(`DELETE FROM advertisements WHERE id = @id`,
-            [{name: 'id', type: NVarChar, value: id}]
+            [{name: 'id', type: sql.NVarChar, value: id}]
         )
-        return { deleteCount: res.rowAffected[0] || 0}
+        return { deleteCount: res.rowsAffected[0] || 0}
     } 
 }
 

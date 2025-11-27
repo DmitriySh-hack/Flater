@@ -1,0 +1,37 @@
+.flat-card__up-container{
+    display: flex;
+    flex-direction: row;
+}
+
+.flar-card__container{
+    border: 1px solid #e0e0e0;
+    border-color: black;
+    border-radius: 15px;
+    padding: 15px;
+    width: 700px;
+}
+
+.flat-card__image{
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flat-card__title{
+    padding-left: 10px;
+}
+
+.flat-card__info{
+    display: flex;
+    flex-direction: column;
+}
+
+.flat-card__rebuilder{
+    padding-top: 5px;
+    display: flex;
+    justify-content: right;
+}

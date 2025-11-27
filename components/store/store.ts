@@ -8,7 +8,6 @@ import type { IADVERTISMENT } from "../models/IAdventisment";
 
 interface AdvertismentState{
     advertisments: IADVERTISMENT[],//Массив объявлений
-    advertismentCount: number;
     error: string | null;
 }
 
@@ -27,7 +26,6 @@ export default class Store {
 
     advertisment: AdvertismentState = {
         advertisments: [],
-        advertismentCount: 0,
         error: null,
     }
     
@@ -48,18 +46,12 @@ export default class Store {
         this.advertisment.advertisments = ads;
     }
 
-    setCountOfAdvertisment(count: number){
-        this.advertisment.advertismentCount = count;
-    }
-
     addAdvertisment(ad: IADVERTISMENT){
         this.advertisment.advertisments.unshift(ad);
-        this.advertisment.advertismentCount++;
     }
 
     removeAdvertisment(adId: string){
         this.advertisment.advertisments = this.advertisment.advertisments.filter(ad => ad.id !== adId)
-        this.advertisment.advertismentCount--;
     }
 
     setAdvertisementError(e: string | null){
@@ -68,14 +60,6 @@ export default class Store {
 
     get userAdvertisment(){
         return this.advertisment.advertisments;
-    }
-
-    get advertismentCount(){
-        return this.advertisment.advertismentCount;
-    }
-
-    get hasAdvertisment(){
-        return this.advertisment.advertismentCount > 0;
     }
 
     get advertismentError(){
@@ -100,7 +84,6 @@ export default class Store {
             this.setAuth(true);
             this.setUser(response.data.user)
 
-            await this.getAdvertismentCount();
             await this.getUserAdvertisments();
 
         } catch (e) {
@@ -127,7 +110,6 @@ export default class Store {
             this.setUser({} as IUSER);
 
             this.setAdvertisment([]);
-            this.setCountOfAdvertisment(0);
 
         } catch (e) {
             console.log('Ошибка выхода:', e);
@@ -142,7 +124,6 @@ export default class Store {
             this.setAuth(true);
             this.setUser(response.data.user)
 
-            await this.getAdvertismentCount();
             await this.getUserAdvertisments();
         } catch (e) {
             console.log('Ошибка проверки аутентификации:', e);
@@ -192,29 +173,6 @@ export default class Store {
             let errorMessage = 'Ошибка при загрузке объявлений';
             const axiosError = e as AxiosError;
             
-            if (axiosError.response?.data?.message) {
-                errorMessage = axiosError.response.data.message;
-                console.log(axiosError.response.data.message);
-            } else {
-                console.log('Ошибка загрузки объявлений:', e);
-            }
-            
-            this.setAdvertisementError(errorMessage);
-            throw e;
-        }
-    }
-
-    async getAdvertismentCount(){
-        if (!this.isAuth) return;
-
-        try{
-            const response = await $api.get(`/advertisements/count`);
-            this.setCountOfAdvertisment(response.data.count)
-            return response.data.count;
-        }catch(e: unknown){
-            let errorMessage = 'Ошибка получения количества объявлений'
-            const axiosError = e as AxiosError;
-
             if (axiosError.response?.data?.message) {
                 errorMessage = axiosError.response.data.message;
                 console.log(axiosError.response.data.message);

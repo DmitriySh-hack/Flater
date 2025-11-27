@@ -28,11 +28,6 @@ class AdvertismentService{
         return advertismentUser.map(ad => new AdvertismentDTO(ad));
     }
 
-    // Получение количества объявлений пользователя
-    async getCounterOfAdvertisment(userId) {
-        return await AdvertismentModel.countByUserId(userId)
-    }
-
     // Обновление объявления
 
     async getUpdateForAdvertisment(userId, adId, addUpdate) {
@@ -57,12 +52,17 @@ class AdvertismentService{
             throw ApiError.BadRequest('Объявление не найдено');
         }
 
-        if (advertisement.user_id !== userId) {
+        if (advertisement.user_id.toString() !== userId.toString()) {
             throw ApiError.BadRequest('Нет прав для удаления этого объявления');
         }
 
-        await AdvertismentModel.deleteById(adId);
-        return { success: true };
+        const result = await AdvertismentModel.deleteById(adId);
+        
+        if (result.deleteCount === 0) {
+            throw ApiError.BadRequest('Объявление не было удалено');
+        }
+
+        return { success: true, message: 'Объявление успешно удалено' };
     }
 }
 

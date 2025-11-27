@@ -23,16 +23,6 @@ class AdvertisementController{
         }
     }
 
-    async getCounterOfAdvertisment(req, res, next){
-        try{
-            const userId = req.user.id
-            const result = await AdvertismentService.getCounterOfAdvertisment(userId)
-            return res.json({count: result});
-        }catch(e){
-            next(e)
-        }
-    }
-
     async getUpdateForAdvertisment(req, res, next){
         try{
             const userId = req.user.id;

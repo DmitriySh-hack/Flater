@@ -23,7 +23,6 @@ export const Advertisment = observer(() => {
     
     useEffect(() => {
         if (store.isAuth) {
-            store.getAdvertismentCount()
             store.getUserAdvertisments()
         }
     }, [store.isAuth])
@@ -50,7 +49,7 @@ export const Advertisment = observer(() => {
     if(store.isAuth){
         return(
             <div className='main-container'>
-                <div style={{fontSize: '18px'}}>Список Ваших объявлений: {store.advertismentCount}</div>
+                <div style={{fontSize: '18px'}}>Список Ваших объявлений: {store.userAdvertisment.length}</div>
 
 
                 <button onClick={() => setOpenModal(true)}>Создать объявление</button>
@@ -65,7 +64,7 @@ export const Advertisment = observer(() => {
                     {store.userAdvertisment.length === 0 ? (
                         <p>У вас нет объявлений</p>
                     ) : (
-                        <div>
+                        <div className='advertisement-container'>
                             {store.userAdvertisment.map(ad => (
                                 <CardOfFlat key={ad.id} advertisement={ad}/>
                             ))}
