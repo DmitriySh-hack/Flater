@@ -64,7 +64,12 @@ const AdvertismentModel = {
             [{name: 'id', type: sql.NVarChar, value: id}]
         )
         return { deleteCount: res.rowsAffected[0] || 0}
-    } 
+    },
+
+    async findAll(){
+        const res = await query(`SELECT * FROM advertisements`)
+        return res.recordset;
+    }
 }
 
 module.exports = AdvertismentModel;

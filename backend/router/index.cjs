@@ -43,4 +43,6 @@ router.get('/advertisements', authMidddleware, advertisementController.getAdvert
 router.put('/advertisements/:id', authMidddleware, advertisementController.getUpdateForAdvertisment);
 router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);
 
+router.get('/advertisements/all', advertisementController.getAllAdvertisements);
+
 module.exports = router

@@ -22,13 +22,10 @@ class AdvertismentService{
         return new AdvertismentDTO(newAdvertisment)
     }
 
-    // Получение объявлений пользователя
     async getAdvertismentUser(userId){
         const advertismentUser = await AdvertismentModel.findByUserId(userId)
         return advertismentUser.map(ad => new AdvertismentDTO(ad));
     }
-
-    // Обновление объявления
 
     async getUpdateForAdvertisment(userId, adId, addUpdate) {
         const advertismentUser = await AdvertismentModel.findById(adId);
@@ -44,7 +41,6 @@ class AdvertismentService{
         return new AdvertismentDTO(updateAd)
     }
 
-    // Удаление объявления
     async deleteAdvertisment(userId, adId){
         const advertisement = await AdvertismentModel.findById(adId);
         
@@ -63,6 +59,31 @@ class AdvertismentService{
         }
 
         return { success: true, message: 'Объявление успешно удалено' };
+    }
+
+    async getAllAdvertisments(){
+        try {
+            console.log('🔍 Service: Getting all advertisements...');
+            const allAdvertisements = await AdvertismentModel.findAll();
+            console.log('🔍 Service: Found', allAdvertisements.length, 'advertisements');
+            
+            if (!allAdvertisements || allAdvertisements.length === 0) {
+                console.log('🔍 Service: No advertisements found');
+                return [];
+            }
+            
+            // ВАЖНО: исправленная строка!
+            const mappedAds = allAdvertisements.map(advertisement => {
+                console.log('🔍 Service: Mapping ad ID:', advertisement.id);
+                return new AdvertismentDTO(advertisement);
+            });
+            
+            console.log('🔍 Service: Successfully mapped', mappedAds.length, 'ads');
+            return mappedAds;
+        } catch (error) {
+            console.error('❌ Service Error in getAllAdvertisements:', error);
+            throw error;
+        }
     }
 }
 

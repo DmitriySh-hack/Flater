@@ -31,9 +31,29 @@ export default class Store {
 
     selectedAdvertisement: IADVERTISMENT | null = null
 
+    publicAdvertisements: IADVERTISMENT[] = [];
+    publicAdsLoading = false;
+    publicAdsError: string | null = null;
+
+
+
     setSelectedAd(ad: IADVERTISMENT){
         this.selectedAdvertisement = ad;
     }
+
+
+    setPublicAdvertisements(ads: IADVERTISMENT[]) {
+        this.publicAdvertisements = ads;
+    }
+
+    setPublicAdsLoading(loading: boolean) {
+        this.publicAdsLoading = loading;
+    }
+
+    setPublicAdsError(error: string | null) {
+        this.publicAdsError = error;
+    }
+
         
     constructor() {
         makeAutoObservable(this);
@@ -255,6 +275,35 @@ export default class Store {
                         
             this.setAdvertisementError(errorMessage);
             throw e;
+        }
+    }
+
+    async getAllAdvertisments(){
+        this.setPublicAdsLoading(true);
+        this.setPublicAdsError(null);
+
+        try{
+            const response = await fetch('http://localhost:5000/api/advertisements/all');
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            this.setPublicAdvertisements(data);
+            return data;
+        }catch(e: unknown){
+            let errorMessage = 'Ошибка загрузки объявлений';
+
+            if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+
+            this.setPublicAdsError(errorMessage);
+            console.log('Ошибка загрузки публичных объявлений:', e);
+            throw e;
+        }finally{
+            this.setPublicAdsLoading(false);
         }
     }
 }
