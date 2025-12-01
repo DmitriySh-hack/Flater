@@ -28,7 +28,13 @@ export default class Store {
         advertisments: [],
         error: null,
     }
-    
+
+    selectedAdvertisement: IADVERTISMENT | null = null
+
+    setSelectedAd(ad: IADVERTISMENT){
+        this.selectedAdvertisement = ad;
+    }
+        
     constructor() {
         makeAutoObservable(this);
         this.initializeAuth();

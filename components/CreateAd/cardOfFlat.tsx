@@ -3,6 +3,8 @@ import { IADVERTISMENT } from "../models/IAdventisment";
 import './cardOfFlar.css'
 import { useState, useContext } from 'react';
 import { Context } from '../../src/main';
+import { EditModal } from './EditAd/EditModal'
+import {AdvertisementData} from './CreateAdvertismentModal/AdvertisementData'
 
 interface CardOfFlatProps {
     advertisement: IADVERTISMENT
@@ -12,6 +14,7 @@ export const CardOfFlat = observer((props: CardOfFlatProps) => {
     const {advertisement} = props;
     const { id, title, price, city, street, countOfRooms, images } = advertisement
     const {store} = useContext(Context)
+    const [openModal, setOpenModal] = useState(false)
 
     const [image, setImage] = useState(false)
     const defaultPhoto = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png?20210118073241'
@@ -23,6 +26,24 @@ export const CardOfFlat = observer((props: CardOfFlatProps) => {
             await store.deleteAdvertisment(id)
         }catch(error){
             console.log('Удаление не удалось: ', error)
+        }
+    }
+
+    const handleCloseAd = () => {
+        setOpenModal(false)
+    }
+
+    const handleOpenAd = () => {
+        store.setSelectedAd(advertisement);
+        setOpenModal(true);
+    }
+
+    const handleEditAd = async (adData: AdvertisementData) => {
+        try{
+            await store.updateAdvertisment(id, adData)
+            handleCloseAd();
+        }catch(error){
+            console.log('Редактирование не удалось!', error)
         }
     }
 
@@ -51,7 +72,12 @@ export const CardOfFlat = observer((props: CardOfFlatProps) => {
             </div>
 
             <div className='flat-card__rebuilder'>
-                <button style={{margin: '5px'}}>Редактировать</button>
+                <button style={{margin: '5px'}} onClick={handleOpenAd}>Редактировать</button>
+                <EditModal
+                    isOpen = {openModal}
+                    isClose = {handleCloseAd}
+                    onEdit = {handleEditAd}
+                />
                 <button onClick={handleDeleteAd} style={{margin: '5px'}}>Удалить</button>
             </div>
         </div>
