@@ -2,6 +2,8 @@ import { Context } from '../../../src/main';
 import './Middle_side.css'
 import filter from './filter.png'
 import { useEffect, useState, useContext } from 'react'
+import heartShape from './Favorite/heart-shape.png'
+import heart from './Favorite/heart.png'
 
 
 function Middle_side(){
@@ -11,6 +13,8 @@ function Middle_side(){
     const [isLoading, setIsLoading] = useState(false)
 
     const [showFilter, setShowFilter] = useState(false);
+
+    const [favorite, setFavorite] = useState(false)
 
     const handleFilter = () => {
         setShowFilter(!showFilter);
@@ -93,7 +97,18 @@ function Middle_side(){
                                     }}
                                 />
                                 <div className='info-container'>
-                                    <h3 className="ad-title">{ad.title}</h3>
+                                    <div style={{display:'flex', justifyContent:'space-between'}}>
+                                        <h3 className="ad-title">{ad.title}</h3>
+                                        <div style={{display: 'flex', alignItems: 'center'}}>
+                                            <img
+                                                style={{cursor: 'pointer', width: '30px', height: '30px'}}
+                                                src={favorite ? heart : heartShape}
+                                                onClick={() => {
+                                                    setFavorite(!favorite)
+                                                }}
+                                            />
+                                        </div>    
+                                    </div>
                                     <div className="ad-content">
                                         <div className="price-badge">
                                             {ad.price.toLocaleString('ru-RU')} ₽
@@ -111,6 +126,10 @@ function Middle_side(){
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div style={{margin: '5px', display:'flex', justifyContent: 'right', alignItems: 'end'}}>
+                                <button style={{marginRight: '4px'}}>Связать с продавцом</button>
+                                <button>Забронировать</button>
                             </div>
                         </div>
                     ))
