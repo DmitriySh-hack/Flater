@@ -8,6 +8,13 @@ function Middle_side(){
     const placeh = ['Hello!', 'Hi!', 'Bonjuor!'];
     const [placehState, setPlacehState] = useState(0);
     const {store} = useContext(Context)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const [showFilter, setShowFilter] = useState(false);
+
+    const handleFilter = () => {
+        setShowFilter(!showFilter);
+    }
 
     useEffect(() => {
         let currentIndex = 0;
@@ -23,9 +30,12 @@ function Middle_side(){
     useEffect(() => {
         const loadAdvertisment = async () => {
             try{
+                setIsLoading(true)
                 await store.getAllAdvertisments()
             }catch(e){
                 console.log(e)
+            }finally{
+                setIsLoading(false)
             }
         }
 
@@ -45,10 +55,16 @@ function Middle_side(){
                     className="search-input"
                     placeholder={placeholder}
                 />
-                <button className="filter-button">
-                    <img src={filter} alt="Фильтр" />
+                <button className="filter-button" onClick={handleFilter}>
+                    <img width="20px" src={filter} alt="Фильтр" />
                 </button>
             </div>
+
+            {isLoading && (
+                <div className="loading-indicator">
+                    Загрузка объявлений...
+                </div>
+            )}
 
             <div className="ads-count">
                 Найдено {advertisementsToShow.length} объявлений
@@ -76,22 +92,23 @@ function Middle_side(){
                                         e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png?20210118073241';
                                     }}
                                 />
-                                <div className="price-badge">
-                                    {ad.price.toLocaleString('ru-RU')} ₽
-                                </div>
-                            </div>
-                            
-                            <div className="ad-content">
-                                <h3 className="ad-title">{ad.title}</h3>
-                                
-                                <div className="ad-details">
-                                    <div className="detail">
-                                        <span className="detail-label">Комнат:</span>
-                                        <span className="detail-value">{ad.countOfRooms}</span>
-                                    </div>
-                                    <div className="detail">
-                                        <span className="detail-label">Адрес:</span>
-                                        <span className="detail-value">{ad.city}, {ad.street}</span>
+                                <div className='info-container'>
+                                    <h3 className="ad-title">{ad.title}</h3>
+                                    <div className="ad-content">
+                                        <div className="price-badge">
+                                            {ad.price.toLocaleString('ru-RU')} ₽
+                                        </div>
+
+                                        <div className="ad-details">
+                                            <div className="detail">
+                                                <span className="detail-label">Комнат:</span>
+                                                <span className="detail-value">{ad.countOfRooms}</span>
+                                            </div>
+                                            <div className="detail">
+                                                <span className="detail-label">Адрес:</span>
+                                                <span className="detail-value">{ad.city}, {ad.street}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

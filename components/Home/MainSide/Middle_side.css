@@ -1,5 +1,69 @@
-.searchTheFlat{
+.middle-side{
     display: flex;
-    justify-content: center;
+    align-items: center;
     margin: 20px;
+    flex-direction: column;
+}
+
+.search-section{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.search-input{
+    width: 1000px;
+    height: 32px;
+    border-radius: 5px;
+}
+
+.filter-button{
+    width: 36px;
+    height: 32px;
+    margin-left: 6px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter-button:hover{
+    color: aquamarine;
+}
+
+.ads-count{
+    padding: 20px 0;
+    text-align: left;
+    font-size: 18px;
+    width: 1000px;
+    margin: 0 auto;
+}
+
+.advertisements-grid{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+.ad-card-public{
+    width: 1000px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-color: black;
+    border-radius: 15px;
+}
+
+.ad-image-container{
+    display: flex;
+    flex-direction: row;
+}
+
+.ad-image{
+    width: 150px;
+}
+
+.info-container{
+    margin-left: 20px;
 }
