@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite';
-import { IADVERTISMENT } from "../models/IAdventisment";
+import type { IADVERTISMENT } from "../models/IAdventisment";
 import './cardOfFlar.css'
 import { useState, useContext } from 'react';
 import { Context } from '../../src/main';
 import { EditModal } from './EditAd/EditModal'
-import {AdvertisementData} from './CreateAdvertismentModal/AdvertisementData'
+import type {AdvertisementData} from './CreateAdvertismentModal/AdvertisementData'
 
 interface CardOfFlatProps {
     advertisement: IADVERTISMENT
