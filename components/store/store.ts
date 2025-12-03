@@ -34,8 +34,11 @@ export default class Store {
     publicAdvertisements: IADVERTISMENT[] = [];
     publicAdsLoading = false;
     publicAdsError: string | null = null;
-
-
+    
+    favorites: IADVERTISMENT[] = [];
+    favoritesLoading = false;
+    favoritesError: string | null = null;
+    favoriteStatuses: Record<string, boolean> = {};
 
     setSelectedAd(ad: IADVERTISMENT){
         this.selectedAdvertisement = ad;
@@ -54,6 +57,30 @@ export default class Store {
         this.publicAdsError = error;
     }
 
+
+    setFavorites(favorites: IADVERTISMENT[]) {
+        this.favorites = favorites;
+    }
+
+    setFavoritesLoading(loading: boolean){
+        this.favoritesLoading = loading
+    }
+
+    setFavoritesError(error: string | null){
+        this.favoritesError = error
+    }
+
+    updateFavoriteStatus(advertisementId: string, isFavorite: boolean) {
+        this.favoriteStatuses[advertisementId] = isFavorite;
+    }
+
+    isAdvertisementFavorite(advertisementId: string): boolean {
+        return this.favoriteStatuses[advertisementId] || false;
+    }
+
+    setFavoriteStatuses(statuses: Record<string, boolean>) {
+        this.favoriteStatuses = statuses;
+    }
         
     constructor() {
         makeAutoObservable(this);
@@ -111,6 +138,7 @@ export default class Store {
             this.setUser(response.data.user)
 
             await this.getUserAdvertisments();
+            await this.getFavorites();
 
         } catch (e) {
             console.log('Ошибка входа:', e);
@@ -136,6 +164,8 @@ export default class Store {
             this.setUser({} as IUSER);
 
             this.setAdvertisment([]);
+            this.setFavorites([]);
+            this.setFavoriteStatuses({});
 
         } catch (e) {
             console.log('Ошибка выхода:', e);
@@ -151,8 +181,13 @@ export default class Store {
             this.setUser(response.data.user)
 
             await this.getUserAdvertisments();
+            await this.getFavorites();
         } catch (e) {
             console.log('Ошибка проверки аутентификации:', e);
+            localStorage.removeItem('token');
+            this.setAuth(false);
+            this.setUser({} as IUSER);
+            this.setFavorites([]);
         }
     }
 
@@ -304,6 +339,103 @@ export default class Store {
             throw e;
         }finally{
             this.setPublicAdsLoading(false);
+        }
+    }
+
+    async addFavorite(advertisementId: string){
+        if(!this.isAuth){
+            throw new Error('Необходимо авторизироваться')
+        }
+
+        try{
+            console.log('Отправка запроса на добавление в избранное:', advertisementId);
+            const response = await $api.post(`/favorites`, { advertisementId });
+            console.log('Ответ сервера:', response.data);
+            this.updateFavoriteStatus(advertisementId, true)
+            const ad = this.publicAdvertisements.find(a => a.id == advertisementId)
+            if(ad && !this.favorites.some(f => f.id === advertisementId)){
+                this.favorites.push(ad)
+            }
+            return response.data
+        }catch(e: unknown){
+            const axiosError = e as AxiosError;
+            console.error('Полная ошибка Axios:', axiosError);
+            console.error('Response data:', axiosError.response?.data);
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при добавлении в избранное';
+            console.error('Ошибка добавления в избранное:', e);
+            throw new Error(errorMessage);
+        }
+    }
+
+    async removeFavorite(advertisementId: string){
+        if(!this.isAuth){
+            throw new Error('Необходимо авторизироваться')
+        }
+
+        try{
+            const response = await $api.delete(`/favorites/${advertisementId}`)
+            this.updateFavoriteStatus(advertisementId, false)
+            this.favorites = this.favorites.filter(f => f.id !== advertisementId)
+            return response.data
+        }catch(e: unknown){
+            const axiosError = e as AxiosError;
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при удалении из избранное';
+            console.error('Ошибка удаления из избранного:', e);
+            throw new Error(errorMessage);
+        }
+    }
+
+    async toggleFavorite(advertisementId: string) {
+        const isFavorite = this.isAdvertisementFavorite(advertisementId);
+        
+        if (isFavorite) {
+            return await this.removeFavorite(advertisementId);
+        } else {
+            return await this.addFavorite(advertisementId);
+        }
+    }
+
+    async getFavorites() {
+        if (!this.isAuth) {
+            return [];
+        }
+
+        this.setFavoritesLoading(true);
+        this.setFavoritesError(null);
+
+        try {
+            const response = await $api.get(`/favorites`);
+            this.setFavorites(response.data);
+            return response.data;
+        } catch (error: unknown) {
+            const axiosError = error as AxiosError;
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при загрузке избранного';
+            this.setFavoritesError(errorMessage);
+            console.error('Ошибка загрузки избранного:', error);
+            throw error;
+        } finally {
+            this.setFavoritesLoading(false);
+        }
+    }
+
+    async loadFavoriteStatuses() {
+        if (!this.isAuth || this.publicAdvertisements.length === 0) {
+            return;
+        }
+
+        try {
+            const statuses: Record<string, boolean> = {};
+            
+            const favorites = await this.getFavorites();
+            const favoriteIds = new Set(favorites.map((f: IADVERTISMENT) => f.id));
+            
+            this.publicAdvertisements.forEach(ad => {
+                statuses[ad.id] = favoriteIds.has(ad.id);
+            });
+            
+            this.setFavoriteStatuses(statuses);
+        } catch (error) {
+            console.error('Ошибка загрузки статусов избранного:', error);
         }
     }
 }

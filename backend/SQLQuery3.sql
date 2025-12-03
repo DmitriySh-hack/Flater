@@ -36,3 +36,10 @@ CREATE TABLE advertisements (
     created_at DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE favorite_advertisements (
+    id NVARCHAR(36) PRIMARY KEY,
+    user_id NVARCHAR(36) NOT NULL,
+    advertisement_id NVARCHAR(36) NOT NULL,
+    created_at DATETIME DEFAULT GETDATE()
+);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Modal } from '../../Profile/ModalPagePassword/Modal'
-import {AdvertisementData} from './AdvertisementData'
+import type {AdvertisementData} from './AdvertisementData'
 
 
 export const CreateAdvirtisment = ({

@@ -2,9 +2,6 @@ import { Context } from '../../../src/main';
 import './Middle_side.css'
 import filter from './filter.png'
 import { useEffect, useState, useContext } from 'react'
-import heartShape from './Favorite/heart-shape.png'
-import heart from './Favorite/heart.png'
-
 
 function Middle_side(){
     const placeh = ['Hello!', 'Hi!', 'Bonjuor!'];
@@ -14,11 +11,15 @@ function Middle_side(){
 
     const [showFilter, setShowFilter] = useState(false);
 
-    const [favorite, setFavorite] = useState(false)
-
     const handleFilter = () => {
         setShowFilter(!showFilter);
     }
+
+    useEffect(() => {
+        if (store.isAuth && store.publicAdvertisements.length > 0) {
+            store.loadFavoriteStatuses();
+        }
+    }, [store.isAuth, store.publicAdvertisements.length]);
 
     useEffect(() => {
         let currentIndex = 0;
@@ -47,6 +48,18 @@ function Middle_side(){
     }, [store])
 
     const placeholder = placeh[placehState];
+
+    const handleFavoriteToggle = async (advertisementId: string) => {
+        if (!store.isAuth) {
+            alert('Войдите в систему, чтобы добавлять в избранное');
+            return;
+        }
+        try {
+            await store.toggleFavorite(advertisementId);
+        } catch(error) {
+            console.error('Ошибка при изменении избранного:', error);
+        }
+    };
     
     const advertisementsToShow = store.publicAdvertisements.length > 0 
         ? store.publicAdvertisements 
@@ -100,13 +113,11 @@ function Middle_side(){
                                     <div style={{display:'flex', justifyContent:'space-between'}}>
                                         <h3 className="ad-title">{ad.title}</h3>
                                         <div style={{display: 'flex', alignItems: 'center'}}>
-                                            <img
-                                                style={{cursor: 'pointer', width: '30px', height: '30px'}}
-                                                src={favorite ? heart : heartShape}
-                                                onClick={() => {
-                                                    setFavorite(!favorite)
-                                                }}
-                                            />
+                                            <button
+                                                className={`heart-button ${store.isAdvertisementFavorite(ad.id) ? 'favorite' : ''}`}
+                                                onClick={() => handleFavoriteToggle(ad.id)}
+                                                title={store.isAdvertisementFavorite(ad.id) ? 'Удалить из избранного' : 'Добавить в избранное'}
+                                            />          
                                         </div>    
                                     </div>
                                     <div className="ad-content">

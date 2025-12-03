@@ -1,6 +1,6 @@
 import { Context } from '../../../src/main'
 import { Modal } from '../../Profile/ModalPagePassword/Modal'
-import {AdvertisementData} from '../CreateAdvertismentModal/AdvertisementData'
+import type {AdvertisementData} from '../CreateAdvertismentModal/AdvertisementData'
 import { useState, useContext} from 'react'
 
 export const EditModal = ({

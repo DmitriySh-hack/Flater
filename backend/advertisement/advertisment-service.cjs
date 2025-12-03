@@ -72,7 +72,6 @@ class AdvertismentService{
                 return [];
             }
             
-            // ВАЖНО: исправленная строка!
             const mappedAds = allAdvertisements.map(advertisement => {
                 console.log('🔍 Service: Mapping ad ID:', advertisement.id);
                 return new AdvertismentDTO(advertisement);

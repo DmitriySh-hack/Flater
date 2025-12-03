@@ -7,6 +7,7 @@ const authMidddleware = require('../middleware/auth-middleware.cjs');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const FavoriteAdvertisementController = require('../favorite-advertisement/favorite-advertisement-controller.cjs')
 
 //Создание директории аватарки
 const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
@@ -44,5 +45,11 @@ router.put('/advertisements/:id', authMidddleware, advertisementController.getUp
 router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);
 
 router.get('/advertisements/all', advertisementController.getAllAdvertisements);
+
+
+//Избранное
+router.post('/favorites', authMidddleware, FavoriteAdvertisementController.addAdvertismentToFavorite);
+router.get('/favorites', authMidddleware, FavoriteAdvertisementController.getFavorite);
+router.delete('/favorites/:advertisementId', authMidddleware, FavoriteAdvertisementController.deleteFavoriteAdvertisement)
 
 module.exports = router

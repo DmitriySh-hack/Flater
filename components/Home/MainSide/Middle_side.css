@@ -68,3 +68,28 @@
     margin-left: 20px;
     width: 100%;
 }
+
+.heart-button {
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    position: relative;
+}
+
+.heart-button::before {
+    content: '🤍';
+    font-size: 22px;
+    transition: transform 0.2s;
+}
+
+.heart-button.favorite::before {
+    content: '❤️';
+    filter: none;
+}
+
+.heart-button:hover::before {
+    transform: scale(1.1);
+}
