@@ -68,12 +68,6 @@ export const Profile = observer(() => {
         }
     }
 
-    useEffect(() => {
-        if(localStorage.getItem('token')){
-            store.checkAuth()
-        }
-    }, [])
-
     if(!store.isAuth){
         return (
             <div className='no-Auth-Profile'>

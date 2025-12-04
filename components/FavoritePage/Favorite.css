@@ -1,0 +1,10 @@
+.favorites-grid{
+    display: flex;
+    align-items: center;
+    margin: 20px;
+    flex-direction: column;
+}
+
+.favorite-card{
+    
+}

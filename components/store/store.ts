@@ -44,7 +44,6 @@ export default class Store {
         this.selectedAdvertisement = ad;
     }
 
-
     setPublicAdvertisements(ads: IADVERTISMENT[]) {
         this.publicAdvertisements = ads;
     }
@@ -173,21 +172,56 @@ export default class Store {
     }
 
     async checkAuth(){
+        console.log('🔄 [Store] checkAuth called');
+        console.log('📝 LocalStorage token:', localStorage.getItem('token'));
+        
         try{
+            console.log('📤 Sending request to /refresh...');
             const response = await $api.get<AuthResponse>(`/refresh`);
-            console.log(response)
+            
+            console.log('✅ Response received, status:', response.status);
+            console.log('👤 User data:', response.data.user);
+            console.log('🔑 New access token:', response.data.accessToken.substring(0, 20) + '...');
+            
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
-            this.setUser(response.data.user)
+            this.setUser(response.data.user);
 
+            console.log('📥 Loading user advertisements...');
             await this.getUserAdvertisments();
+            
+            console.log('📥 Loading favorites...');
             await this.getFavorites();
-        } catch (e) {
-            console.log('Ошибка проверки аутентификации:', e);
+            
+            console.log('✅ Auth check completed successfully');
+            
+        } catch (e: unknown) {
+            console.error('❌ Error in checkAuth:');
+            
+            if (e && typeof e === 'object' && 'response' in e) {
+                const axiosError = e as { 
+                    response?: { 
+                        status?: number; 
+                        data?: { message?: string } 
+                    }; 
+                    message?: string 
+                };
+                
+                console.error('Status:', axiosError.response?.status);
+                console.error('Message:', axiosError.response?.data?.message || axiosError.message || 'Unknown error');
+            } else if (e instanceof Error) {
+                console.error('Error:', e.message);
+            } else {
+                console.error('Unknown error:', e);
+            }
+            
             localStorage.removeItem('token');
             this.setAuth(false);
             this.setUser({} as IUSER);
             this.setFavorites([]);
+            this.setAdvertisment([]);
+            
+            throw e;
         }
     }
 

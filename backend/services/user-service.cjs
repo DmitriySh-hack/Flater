@@ -76,24 +76,47 @@ class UserService{
     }
 
     async refresh(refreshToken){
+        console.log('🔄 [UserService.refresh] Processing refresh');
+        
         if(!refreshToken){
             throw ApiError.UnathorizedError();
         }
-        const userData = tokenService.validateRefreshToken(refreshToken);
-        const tokenFromDB = await tokenService.findToken(refreshToken);
-        if(!userData || !tokenFromDB){
-            throw ApiError.UnathorizedError();
-        }
+        
+        try {
+            // 1. Валидируем refresh токен
+            const userData = tokenService.validateRefreshToken(refreshToken);
+            
+            if(!userData){
+                console.log('❌ [UserService.refresh] Token validation failed');
+                throw ApiError.UnathorizedError();
+            }
+            
+            console.log('✅ [UserService.refresh] Token valid for user:', userData.id);
+            
+            // 2. Находим пользователя
+            const user = await userModel.findById(userData.id);
+            
+            if(!user){
+                console.log('❌ [UserService.refresh] User not found');
+                throw ApiError.UnathorizedError();
+            }
 
-        const user = await userModel.findById(userData.id);
-
-        const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto}) 
-        await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
-        return {
-            ...tokens,
-            user: userDto
+            const userDto = new UserDto(user);
+            const tokens = tokenService.generateTokens({...userDto});
+            
+            // 3. Сохраняем НОВЫЙ токен (даже если старый не найден в БД)
+            await tokenService.saveToken(userDto.id, tokens.refreshToken);
+            
+            console.log('✅ [UserService.refresh] New tokens generated');
+            
+            return {
+                ...tokens,
+                user: userDto
+            };
+            
+        } catch (error) {
+            console.error('❌ [UserService.refresh] Error:', error.message);
+            throw error;
         }
     }
 
