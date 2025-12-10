@@ -70,6 +70,21 @@ class AdvertisementController{
             next(e)
         }
     }
+
+    async getAdvertisementWithUser(req, res, next) {
+        try {
+            const { id } = req.params;
+            console.log('🔍 Controller: Getting advertisement with user for ID:', id);
+            
+            const result = await AdvertismentService.getAdvertismentWithUser(id);
+            
+            console.log('✅ Controller: Successfully got advertisement with user');
+            return res.json(result);
+        } catch (e) {
+            console.error('❌ Controller Error in getAdvertisementWithUser:', e);
+            next(e);
+        }
+    }
 }
 
 module.exports = new AdvertisementController()

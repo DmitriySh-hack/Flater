@@ -61,6 +61,34 @@ const UserModel = {
             { name: 'id', type: sql.NVarChar, value: id }
         ]);
         return res.recordset[0] || null;
+    },
+    
+    async findByIds(userIds) {
+        if (!userIds || userIds.length === 0) {
+            return [];
+        }
+        
+        // Создаем параметры для запроса
+        const params = [];
+        const placeholders = [];
+        
+        userIds.forEach((id, index) => {
+            placeholders.push(`@id${index}`);
+            params.push({ 
+                name: `id${index}`, 
+                type: sql.NVarChar, 
+                value: id 
+            });
+        });
+        
+        const queryStr = `
+            SELECT id, email, firstName, lastName, avatarUrl, password, activationLink, isActivated
+            FROM dbo.[users] 
+            WHERE id IN (${placeholders.join(', ')})
+        `;
+        
+        const res = await query(queryStr, params);
+        return res.recordset;
     }
 };
 

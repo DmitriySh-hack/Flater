@@ -1,4 +1,5 @@
 const AdvertismentModel = require('./advertisment-model.cjs');
+const UserModel = require('../models/user-model.cjs');
 const AdvertismentDTO = require('./advertisment-dto.cjs');
 const ApiError = require('../exceptions/api-error.cjs');
 const uuid = require('uuid');
@@ -64,6 +65,8 @@ class AdvertismentService{
     async getAllAdvertisments(){
         try {
             console.log('🔍 Service: Getting all advertisements...');
+            
+            // 1. Получаем все объявления
             const allAdvertisements = await AdvertismentModel.findAll();
             console.log('🔍 Service: Found', allAdvertisements.length, 'advertisements');
             
@@ -72,15 +75,91 @@ class AdvertismentService{
                 return [];
             }
             
+            // 2. Получаем уникальные user_id из объявлений
+            const userIds = [...new Set(allAdvertisements.map(ad => ad.user_id).filter(Boolean))];
+            console.log('🔍 Service: Unique user IDs:', userIds);
+            
+            // 3. Получаем информацию о пользователях ИСПОЛЬЗУЯ СУЩЕСТВУЮЩИЙ UserModel
+            let users = [];
+            if (userIds.length > 0) {
+                users = await UserModel.findByIds(userIds);
+                console.log('🔍 Service: Found', users.length, 'users');
+            }
+            
+            // 4. Создаем Map для быстрого доступа к пользователям по ID
+            const usersMap = new Map();
+            users.forEach(user => {
+                usersMap.set(user.id, user);
+            });
+            
+            // 5. Объединяем данные
             const mappedAds = allAdvertisements.map(advertisement => {
                 console.log('🔍 Service: Mapping ad ID:', advertisement.id);
-                return new AdvertismentDTO(advertisement);
+                
+                // Создаем объект DTO
+                const dto = new AdvertismentDTO(advertisement);
+                
+                // Добавляем информацию о пользователе если есть
+                if (advertisement.user_id && usersMap.has(advertisement.user_id)) {
+                    const user = usersMap.get(advertisement.user_id);
+                    dto.user = {
+                        id: user.id,
+                        email: user.email,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        avatar: user.avatarUrl, // Обратите внимание: у вас avatarUrl, а не avatar
+                        phone: null // Если у вас есть телефон в users, добавьте его
+                    };
+                }
+                
+                return dto;
             });
             
             console.log('🔍 Service: Successfully mapped', mappedAds.length, 'ads');
             return mappedAds;
         } catch (error) {
             console.error('❌ Service Error in getAllAdvertisements:', error);
+            throw error;
+        }
+    }
+
+    async getAdvertismentWithUser(adId) {
+        try {
+            console.log('🔍 Service: Getting advertisement with user for ID:', adId);
+            
+            // 1. Получаем объявление
+            const advertisement = await AdvertismentModel.findById(adId);
+            
+            if (!advertisement) {
+                throw ApiError.BadRequest('Объявление не найдено');
+            }
+            
+            // 2. Создаем DTO
+            const dto = new AdvertismentDTO(advertisement);
+            
+            // 3. Если есть user_id, ищем пользователя ИСПОЛЬЗУЯ СУЩЕСТВУЮЩИЙ findById
+            if (advertisement.user_id) {
+                console.log('🔍 Service: Looking for user with ID:', advertisement.user_id);
+                const user = await UserModel.findById(advertisement.user_id);
+                
+                if (user) {
+                    console.log('✅ Service: Found user:', user.email);
+                    dto.user = {
+                        id: user.id,
+                        email: user.email,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        avatar: user.avatarUrl, // Обратите внимание: avatarUrl
+                        phone: null // Если есть телефон в базе, добавьте его
+                    };
+                } else {
+                    console.log('⚠️ Service: User not found for ID:', advertisement.user_id);
+                }
+            }
+            
+            return dto;
+        } catch (error) {
+            console.error('❌ Service Error in getAdvertismentWithUser:', error);
             throw error;
         }
     }

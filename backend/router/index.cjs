@@ -70,7 +70,7 @@ router.put('/advertisements/:id', authMidddleware, advertisementController.getUp
 router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);
 
 router.get('/advertisements/all', advertisementController.getAllAdvertisements);
-
+router.get('/advertisements/:id/with-user', advertisementController.getAdvertisementWithUser);
 
 //Избранное
 router.post('/favorites', authMidddleware, FavoriteAdvertisementController.addAdvertismentToFavorite);

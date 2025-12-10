@@ -1,7 +1,8 @@
 import { Modal } from '../../Profile/ModalPagePassword/Modal'
 //import { Context } from '../../../src/main';
-//import { useContext } from 'react'
+import { useState, useEffect } from 'react'
 import type { IADVERTISMENT } from '../../models/IAdventisment';
+import type { IUSER } from '../../models/IUser'
 
 export const ModalInfo = ({
     isOpen,
@@ -12,14 +13,63 @@ export const ModalInfo = ({
     isClose: () => void,
     advertisement: IADVERTISMENT | null;
 }) => {
-    
-    //const {store} = useContext(Context)
+    const [userInfo, setUserInfo] = useState<IUSER | null>(null)
+
+    useEffect(() => {
+        if (isOpen && advertisement) {
+            if (advertisement.user) {
+                // Если пользователь уже есть в объявлении (из getAllAdvertisments)
+                setUserInfo(advertisement.user as IUSER);
+            } else if (advertisement.userId) {
+                // Если есть только user_id, загружаем информацию
+                loadUserInfo();
+            }
+        }
+    }, [isOpen, advertisement]);
+
+    const loadUserInfo = async () => {
+        if (!advertisement?.id) return;
+        
+        try {
+            console.log('🔍 ModalInfo: Loading user info for advertisement:', advertisement.id);
+            
+            // Используем новый эндпоинт
+            const response = await fetch(`http://localhost:5000/api/advertisements/${advertisement.id}/with-user`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}` // если нужно
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ ModalInfo: Got user info:', data.user);
+                setUserInfo(data.user);
+            } else {
+                console.error('❌ ModalInfo: Failed to load user info');
+            }
+        } catch (error) {
+            console.error('❌ ModalInfo: Error loading user info:', error);
+        }
+    };
 
     const getSellerName = () => {
-        return advertisement?.user?.firstName 
-            ? `${advertisement.user.firstName} ${advertisement.user.lastName || ''}`
-            : "Продавец";
-    }
+        const user = userInfo || advertisement?.user;
+        
+        if (!user) return "Продавец";
+        
+        if (user.firstName && user.lastName) {
+            return `${user.firstName} ${user.lastName}`;
+        } else if (user.firstName) {
+            return user.firstName;
+        } else if (user.lastName) {
+            return user.lastName;
+        } else if (user.email) {
+            return user.email.split('@')[0];
+        }
+        return "Продавец";
+    };
 
     const getEmail = () => {
         return advertisement?.user?.email
@@ -30,8 +80,8 @@ export const ModalInfo = ({
             <h2>Связь с продавцом</h2>
             
             <div className='infoContaoner'>
-                <div className='info-name'>{getSellerName()}</div>
-                <div className='info-email'>{getEmail()}</div>
+                <div className='info-name'>Продавец: {getSellerName()}</div>
+                <div className='info-email'>Почта для связи: {getEmail()}</div>
             </div>
         </Modal>
     )
