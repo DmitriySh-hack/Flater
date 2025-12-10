@@ -15,9 +15,34 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+const adUploadsDir = path.join(__dirname, '..', 'uploads', 'advertisements');
+if (!fs.existsSync(adUploadsDir)) {
+    fs.mkdirSync(adUploadsDir, { recursive: true });
+}
+
 //Проверка, что файл подходит, как по размеру, так и по формату
 const upload = multer({ 
     storage: multer.memoryStorage(), 
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Разрешены только изображения!'), false);
+        }
+    }
+});
+
+const adUpload = multer({ 
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, adUploadsDir);
+        },
+        filename: (req, file, cb) => {
+            const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
+            cb(null, uniqueName);
+        }
+    }),
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/')) {
@@ -39,7 +64,7 @@ router.put('/change-password', authMidddleware, userController.changePassword);
 router.post('/upload-avatar', authMidddleware, upload.single('avatar'), userController.uploadAvatar);
 
 //Добавление объявления
-router.post('/advertisements', authMidddleware, advertisementController.createAdvertisment);
+router.post('/advertisements', authMidddleware, adUpload.array('images', 10), advertisementController.createAdvertisment);
 router.get('/advertisements', authMidddleware, advertisementController.getAdvertismentUser);
 router.put('/advertisements/:id', authMidddleware, advertisementController.getUpdateForAdvertisment);
 router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);

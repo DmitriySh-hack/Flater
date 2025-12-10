@@ -280,6 +280,57 @@ export default class Store {
         }
     }
 
+    async createAdvertismentWithImages(
+        title: string,
+        price: number | null,
+        city: string,
+        street: string,
+        countOfRooms: number,
+        images?: File[]
+    ) {
+        try {
+            const formData = new FormData();
+            
+            // Добавляем текстовые данные
+            formData.append('title', title);
+            formData.append('price', price?.toString() || '');
+            formData.append('city', city);
+            formData.append('street', street);
+            formData.append('countOfRooms', countOfRooms.toString());
+            
+            // Добавляем файлы (как для аватара)
+            if (images && images.length > 0) {
+                images.forEach((file) => {
+                    formData.append('images', file); // 'images' вместо 'avatar'
+                });
+            }
+            
+            // Используем ту же логику, что и для uploadAvatar
+            const response = await $api.post(`/advertisements`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            this.addAdvertisment(response.data);
+            return response.data;
+            
+        } catch (e: unknown) {
+            let errorMessage = 'Ошибка при создании объявления';
+            const axiosError = e as AxiosError;
+            
+            if (axiosError.response?.data?.message) {
+                errorMessage = axiosError.response.data.message;
+                console.log(axiosError.response.data.message);
+            } else {
+                console.log('Ошибка создания объявления:', e);
+            }
+            
+            this.setAdvertisementError(errorMessage);
+            throw e;
+        }
+    }
+
     async getUserAdvertisments(){
         if (!this.isAuth) return;
 
@@ -461,10 +512,17 @@ export default class Store {
             const statuses: Record<string, boolean> = {};
             
             const favorites = await this.getFavorites();
-            const favoriteIds = new Set(favorites.map((f: IADVERTISMENT) => f.id));
+
+            const validFavorites = favorites.filter((f: IADVERTISMENT | null) => 
+                f && f.id && typeof f.id === 'string'
+            );
+            
+            const favoriteIds = new Set(validFavorites.map((f: IADVERTISMENT) => f.id));
             
             this.publicAdvertisements.forEach(ad => {
-                statuses[ad.id] = favoriteIds.has(ad.id);
+                if (ad && ad.id) {
+                    statuses[ad.id] = favoriteIds.has(ad.id);
+                }
             });
             
             this.setFavoriteStatuses(statuses);

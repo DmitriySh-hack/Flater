@@ -4,12 +4,28 @@ const ApiError = require('../exceptions/api-error.cjs');
 class AdvertisementController{
     async createAdvertisment(req, res, next) {
         try{
-            const userId = req.user.id
-            const advertData = req.body;
-            const result = await AdvertismentService.createAdvertisment(userId, advertData)
+            const userId = req.user.id;
+            
+            // Подготавливаем данные
+            const advertData = {
+                title: req.body.title,
+                price: req.body.price,
+                city: req.body.city,
+                street: req.body.street,
+                countOfRooms: req.body.countOfRooms
+            };
+
+            // Обрабатываем загруженные файлы (как в uploadAvatar)
+            if (req.files && req.files.length > 0) {
+                advertData.images = req.files.map(file => 
+                    `/uploads/advertisements/${file.filename}`
+                );
+            }
+
+            const result = await AdvertismentService.createAdvertisment(userId, advertData);
             return res.json(result);
-        }catch(e){
-            next(e)
+        } catch(e) {
+            next(e);
         }
     }
 

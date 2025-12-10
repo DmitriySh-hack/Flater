@@ -8,11 +8,11 @@ import './Advertisment.css'
 
 interface CreateAdData {
     title: string;
-    price: number;
+    price: number | null;
     city: string;
     street: string;
     countOfRooms: number;
-    images?: string[];
+    images?: File[];
 }
 
 export const Advertisment = observer(() => {
@@ -29,12 +29,16 @@ export const Advertisment = observer(() => {
 
     const handleCreateAd = async (adData: CreateAdData) => {
         try {
-            const submissionData = {
-                ...adData,
-                images: adData.images || [] 
-            }
-
-            await store.createAdvertisment(submissionData) 
+            // Вызываем новый метод с изображениями
+            await store.createAdvertismentWithImages(
+                adData.title,
+                adData.price,
+                adData.city,
+                adData.street,
+                adData.countOfRooms,
+                adData.images // передаем файлы
+            );
+            
             setOpenModal(false);
         } catch (e) {
             console.log('Ошибка создания объявления:', e)

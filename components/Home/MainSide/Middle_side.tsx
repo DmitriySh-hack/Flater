@@ -2,6 +2,7 @@ import { Context } from '../../../src/main';
 import './Middle_side.css'
 import filter from './filter.png'
 import { useEffect, useState, useContext } from 'react'
+import {ModalInfo} from './ModalInfo'
 
 function Middle_side(){
     const placeh = ['Hello!', 'Hi!', 'Bonjuor!'];
@@ -11,9 +12,19 @@ function Middle_side(){
 
     const [showFilter, setShowFilter] = useState(false);
 
+    const [connectWithSeller, setConnectWithSeller] = useState(false)
+
+    const [selectedAdvertisement, setSelectedAdvertisement] = useState<IADVERTISMENT | null>(null);
+
     const handleFilter = () => {
         setShowFilter(!showFilter);
     }
+
+    const handleConnectWithSeller = (ad: IADVERTISMENT) => {
+        setSelectedAdvertisement(ad);
+        setConnectWithSeller(true);
+    }
+
 
     useEffect(() => {
         if (store.isAuth && store.publicAdvertisements.length > 0) {
@@ -60,10 +71,19 @@ function Middle_side(){
             console.error('Ошибка при изменении избранного:', error);
         }
     };
+
+    const formPrice = (priceVal: number | null) => {
+        if(priceVal === null) return 'Цена не указана'
+        return `${priceVal.toLocaleString('ru-RU')} ₽`
+    }
     
     const advertisementsToShow = store.publicAdvertisements.length > 0 
         ? store.publicAdvertisements 
         : [];
+        
+    const getImageUrl = (path: string) => {
+        return `http://localhost:5000${path}`;
+    };
 
     return (
         <div className="middle-side">
@@ -102,7 +122,7 @@ function Middle_side(){
                         <div key={ad.id} className="ad-card-public">
                             <div className="ad-image-container">
                                 <img 
-                                    src={ad.images && ad.images.length > 0 ? ad.images[0] : 'default-photo.jpg'} 
+                                    src={ad.images && ad.images.length > 0 ? getImageUrl(ad.images[0]) : 'default-photo.jpg'} 
                                     alt={ad.title}
                                     className="ad-image"
                                     onError={(e) => {
@@ -122,7 +142,7 @@ function Middle_side(){
                                     </div>
                                     <div className="ad-content">
                                         <div className="price-badge">
-                                            {ad.price.toLocaleString('ru-RU')} ₽
+                                            {formPrice(ad.price)} ₽
                                         </div>
 
                                         <div className="ad-details">
@@ -139,15 +159,21 @@ function Middle_side(){
                                 </div>
                             </div>
                             <div style={{margin: '5px', display:'flex', justifyContent: 'right', alignItems: 'end'}}>
-                                <button style={{marginRight: '4px'}}>Связать с продавцом</button>
+                                <button style={{marginRight: '4px'}} onClick={() => handleConnectWithSeller(ad)}>Связаться с продавцом</button>
                                 <button>Забронировать</button>
                             </div>
                         </div>
                     ))
                 )}
+                <ModalInfo
+                    isOpen={connectWithSeller}
+                    isClose={() => setConnectWithSeller(false)}
+                    advertisement={selectedAdvertisement}
+                />
             </div>
         </div>
     )
 }
+import type { IADVERTISMENT } from '../../models/IAdventisment';
 
 export default Middle_side

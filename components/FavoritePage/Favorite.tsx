@@ -1,8 +1,10 @@
-import { useEffect, useContext, useMemo } from "react";
+import { useEffect, useContext, useMemo, useState } from "react";
 import { Context } from '../../src/main';
+import './Favorite.css'
 
 function Favorite(){
     const {store} = useContext(Context)
+    const [isLoading, setIsLoading] = useState(true);
 
     const uniqueFavorites = useMemo(() => {
         if (!store.favorites || !Array.isArray(store.favorites)) {
@@ -38,16 +40,32 @@ function Favorite(){
 
     useEffect(() => {
         const loadFavoriteAd = async () => {
-            if(!store.isAuth) return;
+            setIsLoading(true);
 
             try{
-                await store.getFavorites()
+                await store.checkAuth();
+
+                if(store.isAuth){
+                    await store.getFavorites()
+                }
             }catch(e){
                 console.log(e)
+            }finally{
+                setIsLoading(false)
             }
         }
         loadFavoriteAd()
     }, [store.isAuth])
+
+     if (isLoading) {
+        return (
+            <div className="favorite-container">
+                <div className="loading">
+                    <p>Загрузка...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!store.isAuth) {
         return (
@@ -61,27 +79,25 @@ function Favorite(){
         );
     }
 
+    const getImageUrl = (path: string) => {
+        return `http://localhost:5000${path}`;
+    };
+
      return (
          <div className="favorites-grid">
                 {uniqueFavorites.map((ad) => (
-                    <div key={`${ad.id}-${Math.random()}`} className="favorite-card"> {/* Временно добавляем random */}
+                    <div key={`${ad.id}-${Math.random()}`} className="favorite-card">
                         <div className="favorite-card-image">
                             <img 
                                 src={ad.images && ad.images.length > 0 
-                                    ? ad.images[0] 
+                                    ? getImageUrl(ad.images[0]) 
                                     : 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png'}
                                 alt={ad.title}
                                 onError={(e) => {
                                     e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png';
                                 }}
+                                style={{width: '150px'}}
                             />
-                            <button 
-                                className="remove-favorite-btn"
-                                onClick={() => handleRemoveFromFavorite(ad.id)}
-                                title="Удалить из избранного"
-                            >
-                                ❌
-                            </button>
                         </div>
                         
                         <div className="favorite-card-content">
@@ -111,6 +127,14 @@ function Favorite(){
                                     </div>
                                 )}
                             </div>
+
+                            <button 
+                                className="remove-favorite-btn"
+                                onClick={() => handleRemoveFromFavorite(ad.id)}
+                                title="Удалить из избранного"
+                            >
+                                ❌
+                            </button>
                         </div>
                     </div>
                 ))}

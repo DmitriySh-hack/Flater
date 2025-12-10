@@ -15,11 +15,14 @@ export const CardOfFlat = observer((props: CardOfFlatProps) => {
     const { id, title, price, city, street, countOfRooms, images } = advertisement
     const {store} = useContext(Context)
     const [openModal, setOpenModal] = useState(false)
+    const [imageError, setImageError] = useState(false)
 
-    const [image, setImage] = useState(false)
     const defaultPhoto = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png?20210118073241'
 
-    const currentImage = (images && images.length > 0 && !image) ? images[0] : defaultPhoto;
+    // Берем первое изображение или дефолтное
+    const currentImage = images && images.length > 0 && !imageError 
+        ? `http://localhost:5000${images[0]}` // Добавляем адрес сервера
+        : defaultPhoto;
 
     const handleDeleteAd = async () => {
         try{
@@ -47,24 +50,28 @@ export const CardOfFlat = observer((props: CardOfFlatProps) => {
         }
     }
 
+    const formPrice = (priceVal: number | null) => {
+        if(priceVal === null) return 'Цена не указана'
+        return `${priceVal.toLocaleString('ru-RU')} ₽`
+    }
+
     return (
         <div className='flar-card__container'>
             <div className='flat-card__up-container'>
                 <div className="flat-card__image">
                     <img 
                         src={currentImage}
+                        alt={title}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={() => setImage(true)}
+                        onError={() => setImageError(true)}
                     />
                 </div>
                 
                 <div className='flat-card__title'>
                     <h3>{title}</h3>
-                    <p>{price.toLocaleString('ru-RU')} ₽</p>
+                    <p>{formPrice(price)}</p>
                 </div>
             </div>
-
-            
 
             <div className='flat-card__info'>
                 <span>Комнат: {countOfRooms}</span>

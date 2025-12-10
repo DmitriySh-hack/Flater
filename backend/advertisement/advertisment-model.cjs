@@ -5,11 +5,27 @@ const AdvertismentModel = {
         const res = await query(`SELECT * FROM advertisements WHERE id = @id`,
             [{name: 'id', type: sql.NVarChar, value: id}]
         );
-        return res.recordset[0] || null;
+        if (res.recordset[0]) {
+            const ad = res.recordset[0];
+            if (ad.images && typeof ad.images === 'string') {
+                try {
+                    ad.images = JSON.parse(ad.images);
+                } catch (e) {
+                    ad.images = [];
+                }
+            } else {
+                ad.images = ad.images || [];
+            }
+            return ad;
+        }
+        return null;
     },
     
     async create(advert){
         const { id, title, price, city, street, countOfRooms, images, userId } = advert
+
+        const imagesJson = images ? JSON.stringify(images) : JSON.stringify([]);
+
         await query(`INSERT INTO advertisements (id, title, price, city, street, countOfRooms, images, user_id) 
             VALUES (@id, @title, @price, @city, @street, @countOfRooms, @images, @userId )`,
             [
@@ -20,7 +36,7 @@ const AdvertismentModel = {
                 { name: 'street', type: sql.NVarChar, value: street },
                 { name: 'countOfRooms', type: sql.Int, value: countOfRooms },
                 { name: 'price', type: sql.Decimal(18,2), value: price },
-                { name: 'images', type: sql.NVarChar, value: JSON.stringify(images) },
+                { name: 'images', type: sql.NVarChar, value: imagesJson },
             ]);
             return await this.findById(id);
     },
@@ -36,7 +52,18 @@ const AdvertismentModel = {
         const res = await query(`SELECT * FROM advertisements WHERE user_id = @userId`,
             [{ name: 'userId', type: sql.NVarChar, value: userId }]
         )
-        return res.recordset;
+        return res.recordset.map(ad => {
+            if (ad.images && typeof ad.images === 'string') {
+                try {
+                    ad.images = JSON.parse(ad.images);
+                } catch (e) {
+                    ad.images = [];
+                }
+            } else {
+                ad.images = ad.images || [];
+            }
+            return ad;
+        });
     },
     
     async findByIdAndUpdate(id, update){
@@ -65,7 +92,18 @@ const AdvertismentModel = {
 
     async findAll(){
         const res = await query(`SELECT * FROM advertisements`)
-        return res.recordset;
+        return res.recordset.map(ad => {
+            if (ad.images && typeof ad.images === 'string') {
+                try {
+                    ad.images = JSON.parse(ad.images);
+                } catch (e) {
+                    ad.images = [];
+                }
+            } else {
+                ad.images = ad.images || [];
+            }
+            return ad;
+        });
     }
 }
 
