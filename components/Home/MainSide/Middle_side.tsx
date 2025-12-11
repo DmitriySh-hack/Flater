@@ -1,47 +1,44 @@
 import { Context } from '../../../src/main';
 import './Middle_side.css'
-import filter from './filter.png'
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState, useContext, useMemo } from 'react'
 import {ModalInfo} from './ModalInfo'
 
-function Middle_side(){
-    const placeh = ['Hello!', 'Hi!', 'Bonjuor!'];
-    const [placehState, setPlacehState] = useState(0);
+function Middle_side({ searchQuery = '' }){
     const {store} = useContext(Context)
     const [isLoading, setIsLoading] = useState(false)
-
-    const [showFilter, setShowFilter] = useState(false);
 
     const [connectWithSeller, setConnectWithSeller] = useState(false)
 
     const [selectedAdvertisement, setSelectedAdvertisement] = useState<IADVERTISMENT | null>(null);
 
-    const handleFilter = () => {
-        setShowFilter(!showFilter);
-    }
+    const filterAdvertisements = useMemo(() => {
+        if (!searchQuery.trim()) {
+            return store.publicAdvertisements;
+        }
+
+        const query = searchQuery.toLowerCase().trim();
+        
+        return store.publicAdvertisements.filter(ad => {
+            
+            const searchInTitle = ad.city?.toLowerCase().includes(query);
+            const searchInID = ad.id?.toLowerCase().includes(query);
+            
+            //const priceMatch = ad.price?.toString().includes(query);
+
+            return searchInTitle || searchInID;
+        });
+    }, [store.publicAdvertisements, searchQuery]);
 
     const handleConnectWithSeller = (ad: IADVERTISMENT) => {
         setSelectedAdvertisement(ad);
         setConnectWithSeller(true);
     }
 
-
     useEffect(() => {
         if (store.isAuth && store.publicAdvertisements.length > 0) {
             store.loadFavoriteStatuses();
         }
     }, [store.isAuth, store.publicAdvertisements.length]);
-
-    useEffect(() => {
-        let currentIndex = 0;
-
-        const intervale = setInterval(() => {
-            currentIndex = (currentIndex + 1) % placeh.length;
-            setPlacehState(currentIndex);
-        }, 2000)
-
-        return () => clearInterval(intervale);
-    },[placeh.length]);
 
     useEffect(() => {
         const loadAdvertisment = async () => {
@@ -58,7 +55,7 @@ function Middle_side(){
         loadAdvertisment()
     }, [store])
 
-    const placeholder = placeh[placehState];
+    
 
     const handleFavoriteToggle = async (advertisementId: string) => {
         if (!store.isAuth) {
@@ -76,10 +73,6 @@ function Middle_side(){
         if(priceVal === null) return 'Цена не указана'
         return `${priceVal.toLocaleString('ru-RU')} ₽`
     }
-    
-    const advertisementsToShow = store.publicAdvertisements.length > 0 
-        ? store.publicAdvertisements 
-        : [];
         
     const getImageUrl = (path: string) => {
         return `http://localhost:5000${path}`;
@@ -87,16 +80,6 @@ function Middle_side(){
 
     return (
         <div className="middle-side">
-            <div className="search-section">
-                <input 
-                    className="search-input"
-                    placeholder={placeholder}
-                />
-                <button className="filter-button" onClick={handleFilter}>
-                    <img width="20px" src={filter} alt="Фильтр" />
-                </button>
-            </div>
-
             {isLoading && (
                 <div className="loading-indicator">
                     Загрузка объявлений...
@@ -104,11 +87,11 @@ function Middle_side(){
             )}
 
             <div className="ads-count">
-                Найдено {advertisementsToShow.length} объявлений
+                Найдено {filterAdvertisements.length} объявлений
             </div>
 
             <div className="advertisements-grid">
-                {advertisementsToShow.length === 0 ? (
+                {filterAdvertisements.length === 0 ? (
                     <div className="no-ads-message">
                         Пока нет объявлений о квартирах
                         {store.isAuth && (
@@ -118,7 +101,7 @@ function Middle_side(){
                         )}
                     </div>
                 ) : (
-                    advertisementsToShow.map(ad => (
+                    filterAdvertisements.map(ad => (
                         <div key={ad.id} className="ad-card-public">
                             <div className="ad-image-container">
                                 <img 
@@ -153,6 +136,9 @@ function Middle_side(){
                                             <div className="detail">
                                                 <span className="detail-label">Адрес:</span>
                                                 <span className="detail-value">{ad.city}, {ad.street}</span>
+                                            </div>
+                                            <div className='articul' style={{color: 'rgb(128, 128, 128)'}}>
+                                                <span style={{color: 'rgba(120, 120, 120)'}}>Артикул:</span> {ad.id}
                                             </div>
                                         </div>
                                     </div>

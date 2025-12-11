@@ -8,7 +8,7 @@ class AdvertismentService{
     async createAdvertisment(userId, advertData){
         const { title, price, city, street, countOfRooms, images } = advertData;
 
-        const id = uuid.v4();
+        const id = Date.now().toString() + Math.floor(Math.random() * 10000).toString();
         const newAdvertisment = await AdvertismentModel.create({
             id,
             userId,
