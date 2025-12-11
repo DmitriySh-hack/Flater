@@ -1,0 +1,24 @@
+.footer-container {
+  width: 100%;
+  background-color: black;
+  color: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  margin-top: auto;
+}
+
+.Logo {
+  height: 40px;
+  cursor: pointer;
+}
+
+.company-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14px;
+  text-align: right;
+}

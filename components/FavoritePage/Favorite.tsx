@@ -126,6 +126,13 @@ function Favorite(){
                                         <span className="detail-value">{ad.countOfRooms}</span>
                                     </div>
                                 )}
+
+                                {ad.id && (
+                                    <div>
+                                        <span>Артикул:</span>
+                                        <span>{ad.id}</span>
+                                    </div>
+                                )}
                             </div>
 
                             <button 
