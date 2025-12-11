@@ -5,10 +5,10 @@ import {ModalInfo} from './ModalInfo'
 import type { IADVERTISMENT } from '../../models/IAdventisment';
 import { observer } from 'mobx-react-lite';
 
+
 interface MiddleSideProps {
     searchQuery?: string;
 }
-
 
 const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
     const {store} = useContext(Context)
