@@ -1,0 +1,28 @@
+.main-container{
+    
+}
+
+.name-container{
+
+}
+
+.workPlace-container{
+    display: flex;
+    flex-direction: row;
+}
+
+.selectedAd-container{
+    aspect-ratio: 1/1;
+    padding: 20px;
+    border: 3px solid black;
+    margin: 1px;
+    border-radius: 10px;
+}
+
+.costAd-container{
+    aspect-ratio: 1/1;
+    padding: 20px;
+    border: 3px solid black;
+    margin: 1px;
+    border-radius: 10px;
+}

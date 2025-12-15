@@ -10,7 +10,8 @@ import Favorite from '../components/FavoritePage/Favorite'
 import { useEffect } from 'react'
 import './App.css'
 import { FilterProvider } from '../components/Home/FilterContext/FilterContext'
-
+import Booking  from '../components/Booking/Booking'
+  
 function App() {
 
   const location = useLocation()
@@ -62,6 +63,7 @@ function App() {
           <Route path='/login' element={<Login/>}/>
           <Route path='/registration' element={<Registration/>}/>
           <Route path='/favorite' element={<Favorite/>}/>
+          <Route path='/booking' element={<Booking/>}/>
         </Routes>
       </main>
       <Footer/>

@@ -24,7 +24,7 @@ class FavoriteAdvertisementService{
 
     async getFavoriteAdvertismentUser(userId){
         const favorites = await FavoriteAdvetisementModel.findByUserId(userId);
-        return favorites.map(fav => new FavoriteAdvertisementDTO(fav));
+        return favorites.map(fav => new FavoriteAdvetisementDTO(fav));
     }
 }
 

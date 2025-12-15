@@ -8,6 +8,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const FavoriteAdvertisementController = require('../favorite-advertisement/favorite-advertisement-controller.cjs')
+const BookingAdvertisementController = require('../booking-advertisement/booking-controller.cjs')
 
 //Создание директории аватарки
 const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
@@ -78,5 +79,9 @@ router.get('/advertisements/all-cities', advertisementController.getAllCities)
 router.post('/favorites', authMidddleware, FavoriteAdvertisementController.addAdvertismentToFavorite);
 router.get('/favorites', authMidddleware, FavoriteAdvertisementController.getFavorite);
 router.delete('/favorites/:advertisementId', authMidddleware, FavoriteAdvertisementController.deleteFavoriteAdvertisement)
+
+router.post('/booking', authMidddleware, BookingAdvertisementController.bookingAdvertisement);
+router.get('/booking', authMidddleware, BookingAdvertisementController.getBooking);
+router.delete('/booking:advertisementId', authMidddleware, BookingAdvertisementController.deleteBookingAdvertisemnt)
 
 module.exports = router

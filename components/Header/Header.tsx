@@ -14,8 +14,8 @@ function HeaderSide() {
             
             <ul className='interactive-header'>
                 <li onClick={() => navigate('/advertisment')}>Сдать жилье</li>
-                <li>Бронирование</li>
-                <li onClick={() => navigate('favorite')}>Избранное</li>
+                <li onClick={() => navigate('/booking')}>Бронирование</li>
+                <li onClick={() => navigate('/favorite')}>Избранное</li>
                 <div className='profile' onClick={() => navigate('/profile')}>
                     Личный кабинет
                 </div>
