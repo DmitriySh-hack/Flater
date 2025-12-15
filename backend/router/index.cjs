@@ -72,6 +72,8 @@ router.delete('/advertisements/:id', authMidddleware, advertisementController.de
 router.get('/advertisements/all', advertisementController.getAllAdvertisements);
 router.get('/advertisements/:id/with-user', advertisementController.getAdvertisementWithUser);
 
+router.get('/advertisements/all-cities', advertisementController.getAllCities)
+
 //Избранное
 router.post('/favorites', authMidddleware, FavoriteAdvertisementController.addAdvertismentToFavorite);
 router.get('/favorites', authMidddleware, FavoriteAdvertisementController.getFavorite);

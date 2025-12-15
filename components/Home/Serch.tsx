@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import filter from '../Home/MainSide/filter.png'
+import { SearchModal } from './SearchModal';
 
 interface SearchProps {
     onSearch: (query: string) => void;
@@ -8,9 +9,10 @@ interface SearchProps {
 
 function Search({onSearch, searchValue} : SearchProps){
     const placeh = ['Hello!', 'Hi!', 'Bonjuor!'];
-    const [showFilter, setShowFilter] = useState(false);
     const [placehState, setPlacehState] = useState(0);
     const [inputValue, setInputValue] = useState(searchValue || '');
+
+    const [modalIsOpen, setModalIsOpen] = useState(false)
 
     const placeholder = placeh[placehState];
 
@@ -30,7 +32,7 @@ function Search({onSearch, searchValue} : SearchProps){
     }, [searchValue]);
 
     const handleFilter = () => {
-        setShowFilter(!showFilter);
+        setModalIsOpen(true)
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +56,11 @@ function Search({onSearch, searchValue} : SearchProps){
                 <button className="filter-button" onClick={handleFilter}>
                     <img width="20px" src={filter} alt="Фильтр" />
                 </button>
+
+                <SearchModal
+                    isOpen={modalIsOpen}
+                    isClose={() => {setModalIsOpen(false)}}
+                />
             </div>
         </>
     )

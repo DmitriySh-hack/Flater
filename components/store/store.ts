@@ -24,6 +24,8 @@ export default class Store {
     isAuth = false;
     isLoading = true;
 
+    cities: string[] = [];
+
     advertisment: AdvertismentState = {
         advertisments: [],
         error: null,
@@ -108,6 +110,10 @@ export default class Store {
 
     setAdvertisementError(e: string | null){
         this.advertisment.error = e;
+    }
+
+    setCities(cities: string[]) {
+        this.cities = cities;
     }
 
     get userAdvertisment(){
@@ -528,6 +534,20 @@ export default class Store {
             this.setFavoriteStatuses(statuses);
         } catch (error) {
             console.error('Ошибка загрузки статусов избранного:', error);
+        }
+    }
+
+    async getAllCities() {
+        try {
+            const response = await $api.get(`/advertisements/all-cities`);
+            this.setCities(response.data);
+            return response.data;
+        } catch (e: unknown) {
+            const axiosError = e as AxiosError;
+            const errorMessage =
+                axiosError.response?.data?.message || "Ошибка получения списка городов";
+            console.error(errorMessage);
+            throw new Error(errorMessage);
         }
     }
 }

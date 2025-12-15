@@ -9,6 +9,7 @@ import {Registration} from '../components/Profile/Register/Registration'
 import Favorite from '../components/FavoritePage/Favorite'
 import { useEffect } from 'react'
 import './App.css'
+import { FilterProvider } from '../components/Home/FilterContext/FilterContext'
 
 function App() {
 
@@ -51,7 +52,11 @@ function App() {
       <HeaderSide />
       <main className="main-content">
         <Routes>
-          <Route path="/home" element={<HomePage />} />
+          <Route path="/home" element={
+            <FilterProvider>
+                <HomePage />
+            </FilterProvider>
+            } />
           <Route path='/profile' element={<Profile/>} />
           <Route path='/advertisment' element={<Advertisment/>}/>
           <Route path='/login' element={<Login/>}/>

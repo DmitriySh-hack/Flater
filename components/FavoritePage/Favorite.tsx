@@ -1,8 +1,9 @@
 import { useEffect, useContext, useMemo, useState } from "react";
 import { Context } from '../../src/main';
 import './Favorite.css'
+import { observer } from "mobx-react-lite";
 
-function Favorite(){
+const Favorite = observer(() => {
     const {store} = useContext(Context)
     const [isLoading, setIsLoading] = useState(true);
 
@@ -147,5 +148,5 @@ function Favorite(){
                 ))}
             </div>
     );
-}
+})
 export default Favorite;

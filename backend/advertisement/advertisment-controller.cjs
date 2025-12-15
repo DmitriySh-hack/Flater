@@ -85,6 +85,15 @@ class AdvertisementController{
             next(e);
         }
     }
+
+    async getAllCities(req, res, next){
+        try{
+            const result = await AdvertismentService.getAllCities()
+            return res.json(result)
+        }catch(e){
+            next(e)
+        }
+    }
 }
 
 module.exports = new AdvertisementController()

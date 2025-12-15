@@ -163,6 +163,18 @@ class AdvertismentService{
             throw error;
         }
     }
+
+
+    async getAllCities(){
+        const allAdvertisements = await AdvertismentModel.findAll();
+        const cities = allAdvertisements
+        .map(ad => ad.city)
+        .filter(city => city && city.trim() !== "");
+
+        const uniqueCities = [...new Set(cities)];
+
+        return uniqueCities
+    }
 }
 
 module.exports = new AdvertismentService();
