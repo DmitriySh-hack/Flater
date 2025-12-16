@@ -12,17 +12,51 @@
 }
 
 .selectedAd-container{
-    aspect-ratio: 1/1;
+    flex-direction: column;
+    width: 1000px;
+}
+
+.costAd-container{
     padding: 20px;
     border: 3px solid black;
     margin: 1px;
     border-radius: 10px;
 }
 
-.costAd-container{
-    aspect-ratio: 1/1;
-    padding: 20px;
+.booking-card{
     border: 3px solid black;
-    margin: 1px;
+    margin: 3px;
     border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.booking-card-main{
+    display: flex;
+    flex-direction: row;
+}
+
+.booking-card-image{
+    margin-right: 25px;
+}
+
+.remove-booking-btn{
+    height: 25px;
+}
+
+.costAd-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.costAd-price{
+    display: flex;
+    flex-direction: column;
+}
+
+.ad-info{
+    margin-bottom: 3px;
 }
