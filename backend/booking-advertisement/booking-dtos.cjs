@@ -5,8 +5,8 @@ module.exports = class BookingAdvertisementDTO{
     createdAt;
     constructor(model){
         this.id = model.id;
-        this.advertisementId = model.advertisementId;
-        this.userId = model.userId;
+        this.advertisementId = model.advertisement_id;
+        this.userId = model.user_id;
         this.createdAt = model.create_at;
     }
 }

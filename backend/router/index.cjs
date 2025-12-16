@@ -82,6 +82,6 @@ router.delete('/favorites/:advertisementId', authMidddleware, FavoriteAdvertisem
 
 router.post('/booking', authMidddleware, BookingAdvertisementController.bookingAdvertisement);
 router.get('/booking', authMidddleware, BookingAdvertisementController.getBooking);
-router.delete('/booking:advertisementId', authMidddleware, BookingAdvertisementController.deleteBookingAdvertisemnt)
+router.delete('/booking/:advertisementId', authMidddleware, BookingAdvertisementController.deleteBookingAdvertisemnt)
 
 module.exports = router

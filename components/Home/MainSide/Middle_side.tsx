@@ -85,6 +85,12 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
     }, [store.isAuth, store.publicAdvertisements.length]);
 
     useEffect(() => {
+        if(store.isAuth && store.publicAdvertisements.length > 0) {
+            store.loadBookingStatus()
+        }
+    }, [store.isAuth, store.publicAdvertisements.length])
+
+    useEffect(() => {
         const loadAdvertisment = async () => {
             try{
                 setIsLoading(true)
@@ -112,6 +118,18 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
             console.error('Ошибка при изменении избранного:', error);
         }
     };
+
+    const handleBookingToggle = async (advertisementId: string) => {
+        if(!store.isAuth){
+            alert('Войдите в систему, чтобы добавлять в избранное');
+            return;
+        }
+        try{
+            await store.toggleBooking(advertisementId)
+        }catch(error){
+            console.error(error)
+        }
+    }
 
     const formPrice = (priceVal: number | null) => {
         if(priceVal === null) return 'Цена не указана'
@@ -218,7 +236,7 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                             </div>
                             <div style={{margin: '5px', display:'flex', justifyContent: 'right', alignItems: 'end'}}>
                                 <button style={{marginRight: '4px'}} onClick={() => handleConnectWithSeller(ad)}>Связаться с продавцом</button>
-                                <button>Забронировать</button>
+                                <button onClick={() => handleBookingToggle(ad.id)}>Забронировать</button>
                             </div>
                         </div>
                     ))

@@ -57,8 +57,8 @@ const Favorite = observer(() => {
         }
         loadFavoriteAd()
     }, [store.isAuth])
-
-     if (isLoading) {
+    
+    if (isLoading) {
         return (
             <div className="favorite-container">
                 <div className="loading">

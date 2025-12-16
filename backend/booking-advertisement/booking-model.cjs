@@ -16,11 +16,18 @@ const BookingAdvertisementModel = {
         return { id, userId, advertisementId }
     },
 
-    async findById(id){
-        const res = await query(`SELECT * FROM booking_advertisement WHERE id=@id`,
-            [{name: 'id', type: sql.NVarChar, value:id}]
-        );
-        return res.recordset[0] || null
+    async findById(id) {
+        try {
+            const res = await query(`
+                SELECT * FROM advertisements 
+                WHERE id = @id
+            `, [{ name: 'id', type: sql.NVarChar, value: id }]);
+            
+            return res.recordset[0] || null;
+        } catch (error) {
+            console.error('Ошибка в AdvertisementModel.findById:', error);
+            return null;
+        }
     },
 
     async findByUserId(userId){
@@ -48,3 +55,5 @@ const BookingAdvertisementModel = {
         return res.recordset[0] || null;
     } 
 }
+
+module.exports = BookingAdvertisementModel;

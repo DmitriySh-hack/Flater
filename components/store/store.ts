@@ -42,6 +42,11 @@ export default class Store {
     favoritesError: string | null = null;
     favoriteStatuses: Record<string, boolean> = {};
 
+    booking: IADVERTISMENT[] = [];
+    bookingLoading = false;
+    bookingError: string | null = null;
+    bookingStatus: Record<string, boolean> = {}
+
     setSelectedAd(ad: IADVERTISMENT){
         this.selectedAdvertisement = ad;
     }
@@ -58,7 +63,7 @@ export default class Store {
         this.publicAdsError = error;
     }
 
-
+    //Избранное
     setFavorites(favorites: IADVERTISMENT[]) {
         this.favorites = favorites;
     }
@@ -82,6 +87,33 @@ export default class Store {
     setFavoriteStatuses(statuses: Record<string, boolean>) {
         this.favoriteStatuses = statuses;
     }
+
+    //Бронирование
+    setBooking(booking: IADVERTISMENT[]){
+        this.booking = booking;
+    }
+
+    setBookingLoading(loading: boolean){
+        this.bookingLoading = loading
+    }
+
+    setBookingError(error:string | null){
+        this.bookingError = error
+    }
+
+    setBookingStatuses(statuses: Record<string, boolean>) {
+        this.bookingStatus = statuses;
+    }
+
+    updateBookingStatus(advertisementId: string, isBooking: boolean){
+        this.bookingStatus[advertisementId] = isBooking
+    }
+
+    isAdvertisementBooking(advertisementId: string): boolean {
+        return this.bookingStatus[advertisementId] || false
+    }
+
+
         
     constructor() {
         makeAutoObservable(this);
@@ -548,6 +580,108 @@ export default class Store {
                 axiosError.response?.data?.message || "Ошибка получения списка городов";
             console.error(errorMessage);
             throw new Error(errorMessage);
+        }
+    }
+
+    async getBookingAdvertisement(){
+        if (!this.isAuth) {
+            return [];
+        }
+
+        this.setBookingLoading(true)
+        this.setBookingError(null)
+
+        try{
+            const response = await $api.get('/booking');
+            this.setBooking(response.data);
+            return response.data;
+
+        }catch(error: unknown){
+            const axiosError = error as AxiosError;
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при загрузке бронирований';
+            this.setBookingError(errorMessage);
+            console.error('Ошибка загрузки бронирований:', error);
+            throw error;
+        } finally {
+            this.setBookingLoading(false)
+        }
+    }
+
+    async loadBookingStatus(){
+        try {
+            const statuses: Record<string, boolean> = {};
+            
+            const booking = await this.getBookingAdvertisement();
+
+            const validBooking = booking.filter((f: IADVERTISMENT | null) => 
+                f && f.id && typeof f.id === 'string'
+            );
+            
+            const bookingIds = new Set(validBooking.map((f: IADVERTISMENT) => f.id));
+            
+            this.publicAdvertisements.forEach(ad => {
+                if (ad && ad.id) {
+                    statuses[ad.id] = bookingIds.has(ad.id);
+                }
+            });
+            
+            this.setBookingStatuses(statuses);
+        } catch (error) {
+            console.error('Ошибка загрузки статусов бронированных:', error);
+        }
+    }
+
+    async addBooking(advertisementId: string){
+        if(!this.isAuth){
+            throw new Error('Необходимо авторизироваться')
+        }
+
+        try{
+            console.log('Отправка запроса на бронирование:', advertisementId);
+            const response = await $api.post(`/booking`, { advertisementId });
+            console.log('Ответ сервера:', response.data);
+            this.updateBookingStatus(advertisementId, true)
+            const ad = this.publicAdvertisements.find(a => a.id == advertisementId)
+            if(ad && !this.booking.some(f => f.id === advertisementId)){
+                this.booking.push(ad)
+            }
+            return response.data
+        }catch(e: unknown){
+            const axiosError = e as AxiosError;
+            console.error('Полная ошибка Axios:', axiosError);
+            console.error('Response data:', axiosError.response?.data);
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при бронирование';
+            console.error('Ошибка при бронирование:', e);
+            throw new Error(errorMessage);
+        }
+    }
+
+
+    async removeBooking(advertisementId: string){
+        if(!this.isAuth){
+            throw new Error('Необходимо авторизироваться')
+        }
+
+        try{
+            const response = await $api.delete(`/booking/${advertisementId}`)
+            this.updateBookingStatus(advertisementId, false)
+            this.booking = this.booking.filter(f => f.id !== advertisementId)
+            return response.data
+        }catch(e: unknown){
+            const axiosError = e as AxiosError;
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при удалении брони';
+            console.error('Ошибка удаления брони:', e);
+            throw new Error(errorMessage);
+        }
+    }
+
+    async toggleBooking(advertisementId: string) {
+        const isFavorite = this.isAdvertisementBooking(advertisementId);
+        
+        if (isFavorite) {
+            return await this.removeBooking(advertisementId);
+        } else {
+            return await this.addBooking(advertisementId);
         }
     }
 }

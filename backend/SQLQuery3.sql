@@ -43,3 +43,10 @@ CREATE TABLE favorite_advertisements (
     advertisement_id NVARCHAR(36) NOT NULL,
     created_at DATETIME DEFAULT GETDATE()
 );
+
+CREATE TABLE booking_advertisement (
+    id NVARCHAR(100) PRIMARY KEY,
+    user_id NVARCHAR(100) NOT NULL,
+    advertisement_id NVARCHAR(100) NOT NULL,
+    create_at DATETIME DEFAULT GETDATE()
+);
