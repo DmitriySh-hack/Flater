@@ -86,67 +86,71 @@ const Favorite = observer(() => {
 
      return (
          <div className="favorites-grid">
+            <div className="favorites-grid-container">
                 {uniqueFavorites.map((ad) => (
                     <div key={`${ad.id}-${Math.random()}`} className="favorite-card">
-                        <div className="favorite-card-image">
-                            <img 
-                                src={ad.images && ad.images.length > 0 
-                                    ? getImageUrl(ad.images[0]) 
-                                    : 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png'}
-                                alt={ad.title}
-                                onError={(e) => {
-                                    e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png';
-                                }}
-                                style={{width: '150px'}}
-                            />
-                        </div>
-                        
-                        <div className="favorite-card-content">
-                            <h3 className="favorite-card-title">{ad.title}</h3>
-                            
-                            <div className="favorite-card-price">
-                                {ad.price.toLocaleString('ru-RU')} ₽
+                        <div style={{display: 'flex', flexDirection: 'row'}}>
+                            <div className="favorite-card-image">
+                                <img 
+                                    src={ad.images && ad.images.length > 0 
+                                        ? getImageUrl(ad.images[0]) 
+                                        : 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png'}
+                                    alt={ad.title}
+                                    onError={(e) => {
+                                        e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png';
+                                    }}
+                                    style={{width: '150px'}}
+                                />
                             </div>
                             
-                            <div className="favorite-card-details">
-                                <div className="detail-item">
-                                    <span className="detail-label">Город:</span>
-                                    <span className="detail-value">{ad.city}</span>
+                            <div className="favorite-card-content">
+                                <h3 className="favorite-card-title">{ad.title}</h3>
+                                
+                                <div className="favorite-card-price">
+                                    {ad.price.toLocaleString('ru-RU')} ₽
                                 </div>
                                 
-                                {ad.street && (
+                                <div className="favorite-card-details">
                                     <div className="detail-item">
-                                        <span className="detail-label">Адрес:</span>
-                                        <span className="detail-value">{ad.street}</span>
+                                        <span className="detail-label">Город:</span>
+                                        <span className="detail-value">{ad.city}</span>
                                     </div>
-                                )}
-                                
-                                {ad.countOfRooms && (
-                                    <div className="detail-item">
-                                        <span className="detail-label">Комнат:</span>
-                                        <span className="detail-value">{ad.countOfRooms}</span>
-                                    </div>
-                                )}
+                                    
+                                    {ad.street && (
+                                        <div className="detail-item">
+                                            <span className="detail-label">Адрес:</span>
+                                            <span className="detail-value">{ad.street}</span>
+                                        </div>
+                                    )}
+                                    
+                                    {ad.countOfRooms && (
+                                        <div className="detail-item">
+                                            <span className="detail-label">Комнат:</span>
+                                            <span className="detail-value">{ad.countOfRooms}</span>
+                                        </div>
+                                    )}
 
-                                {ad.id && (
-                                    <div>
-                                        <span>Артикул:</span>
-                                        <span>{ad.id}</span>
-                                    </div>
-                                )}
+                                    {ad.id && (
+                                        <div>
+                                            <span>Артикул:</span>
+                                            <span>{ad.id}</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-
-                            <button 
-                                className="remove-favorite-btn"
-                                onClick={() => handleRemoveFromFavorite(ad.id)}
-                                title="Удалить из избранного"
-                            >
-                                ❌
-                            </button>
                         </div>
+                        
+                        <button 
+                            className="remove-favorite-btn"
+                            onClick={() => handleRemoveFromFavorite(ad.id)}
+                            title="Удалить из избранного"
+                        >
+                            ❌
+                        </button>
                     </div>
                 ))}
-            </div>
+            </div>       
+        </div>
     );
 })
 export default Favorite;
