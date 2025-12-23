@@ -99,6 +99,9 @@ const Favorite = observer(() => {
 
      return (
          <div className="favorites-grid">
+
+            <div className="favorites-page-name">Избранное</div>
+
             <div className="favorites-grid-container">
                 {uniqueFavorites.map((ad) => (
                     <div key={`${ad.id}-${Math.random()}`} className="favorite-card">
@@ -121,7 +124,7 @@ const Favorite = observer(() => {
                                     <h3 className="favorite-card-title">{ad.title}</h3>
                                     
                                     <div className="favorite-card-price">
-                                        {ad.price.toLocaleString('ru-RU')} ₽/месяц
+                                        {ad.price.toLocaleString('ru-RU')} ₽/день
                                     </div>
                                     
                                     <div className="favorite-card-details">

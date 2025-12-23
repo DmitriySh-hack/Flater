@@ -2,6 +2,7 @@ import { Modal } from '../Profile/ModalPagePassword/Modal'
 import { useEffect, useContext, useState } from 'react';
 import { Context } from '../../src/main';
 import {useFilterContext} from './FilterContext/useFilterContext'
+import './SearchModal.css'
 
 export const SearchModal = ({
     isOpen,
@@ -49,37 +50,42 @@ export const SearchModal = ({
 
     return(
         <Modal isOpen={isOpen} isClose={isClose}>
-            <div>
-                <h1>Фильтры</h1>
+            <div className='modal-filter-container'>
+                <h1 className='name-filter-modal'>Фильтры</h1>
 
-                <div>
-                    <div>
-                            от <input
-                                type='number' 
-                                placeholder='Цена от'
-                                value={price.from || ''} 
-                                onChange={(e) => handleChangePrice('from', 
-                                    e.target.value ? parseFloat(e.target.value) : undefined
-                                )}
-                            /> 
-                            до <input 
-                                type='number' 
-                                placeholder='Цена до' 
-                                value={price.to || ''}
-                                onChange={(e) => handleChangePrice('to',
-                                    e.target.value ? parseFloat(e.target.value) : undefined
-                                )}
-                            />
-                        </div>
+                <hr></hr>
+
+                <div className='info-filter-modal'>
+                    <div className='inputs-filter-modal'>
+                        от <input
+                            className='priceTo-filter-modal'
+                            type='number' 
+                            placeholder='Цена от'
+                            value={price.from || ''} 
+                            onChange={(e) => handleChangePrice('from', 
+                                e.target.value ? parseFloat(e.target.value) : undefined
+                            )}
+                        />
+                        до <input 
+                            className='priceFrom-filter-modal'
+                            type='number' 
+                            placeholder='Цена до' 
+                            value={price.to || ''}
+                            onChange={(e) => handleChangePrice('to',
+                                e.target.value ? parseFloat(e.target.value) : undefined
+                            )}
+                        />
+                    </div>
                     
-                    <div>
-                        <span>Город</span>
-                        <div>
+                    <div className='cities-filter-modal-container'>
+                        <div className='cities-filter-word'>Город:</div>
+                        <div className='cities-filter-modal'>
                             <select
+                                className='cities-filter-selector'
                                 value={chooseCity}
                                 onChange={(e) => setChooseCity(e.target.value)}
                             >
-                                <option value="">Все города</option>
+                                <option className='all-cities-filter' value="">Все города</option>
 
                                 {store.cities.map((city) => (
                                     <option key={city} value={city}>
@@ -90,10 +96,11 @@ export const SearchModal = ({
                         </div>
                     </div>
 
-                    <div>
-                        <span>Кол-во комнат</span>
-                        <div>
+                    <div className='rooms-filter-modal-container'>
+                        <span className='rooms-filter-word'>Кол-во комнат:</span>
+                        <div className='rooms-filter-modal'>
                             <select
+                                className='rooms-filter-selector'
                                 value={roomsCount}
                                 onChange={(e) => setRoomsCount(e.target.value ? parseInt(e.target.value) : '')}
                             >
@@ -109,8 +116,10 @@ export const SearchModal = ({
                     </div>
                 </div>
 
-                <button onClick={() => {handleFilter()}}>Фильтрация</button>
-                <button onClick={() => {handleReset()}}>Сбросить</button>
+                <div className='filter-btn-container'>
+                    <button className='filter-btn-filter' onClick={() => {handleFilter()}}>Фильтрация</button>
+                    <button className='filter-btn-reset' onClick={() => {handleReset()}}>Сбросить</button>
+                </div>
             </div>
         </Modal>
     )

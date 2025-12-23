@@ -1,0 +1,108 @@
+.modal-filter-container{
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 16px;
+}
+
+.name-filter-modal{
+    padding: 10px;
+}
+
+.info-filter-modal{
+    padding: 10px;
+}
+
+
+.filter-btn-container{
+    padding: 10px;
+    display: flex;
+    justify-content: right;
+}
+
+.filter-btn-filter{
+    padding: 4px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+.filter-btn-reset{
+    padding: 4px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+
+.priceTo-filter-modal{
+    margin: 3px;
+    margin-right: 5px;
+    border-radius: 5px;
+    padding: 3px;
+    font-size: 14px;
+}
+
+.priceFrom-filter-modal{
+    margin: 3px;
+    border-radius: 5px;
+    padding: 3px;
+    font-size: 14px;
+}
+
+.cities-filter-selector{
+    border-radius: 5px;
+    padding: 3px
+}
+
+.rooms-filter-selector{
+    border-radius: 5px;
+    padding: 3px
+}
+
+
+.inputs-filter-modal{
+    padding-bottom: 15px;
+}
+
+
+.cities-filter-modal-container{
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 15px;
+}
+
+.cities-filter-word{
+    padding: 3px;
+    
+}
+.cities-filter-modal{
+    padding: 3px;
+}
+
+
+.rooms-filter-modal-container{
+    display: flex;
+    flex-direction: row;
+}
+
+.rooms-filter-word{
+    padding: 3px;
+}
+.rooms-filter-modal{
+    padding: 3px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

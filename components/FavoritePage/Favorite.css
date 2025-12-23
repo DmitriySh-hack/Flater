@@ -1,3 +1,9 @@
+.favorites-page-name{
+    padding-bottom: 24px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
 .favorites-grid-container{
     width: 1000px;
 }
@@ -43,5 +49,10 @@
 
 .favorite-card-title{
     font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.favorite-card-price{
+    font-weight: 600;
     margin-bottom: 5px;
 }

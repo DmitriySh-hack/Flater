@@ -112,7 +112,7 @@ const Booking = observer(() => {
                                     <h3 className="booking-card-title">{ad.title}</h3>
                                     
                                     <div className="booking-card-price">
-                                        {ad.price.toLocaleString('ru-RU')} ₽
+                                        {ad.price.toLocaleString('ru-RU')} ₽/день
                                     </div>
                                     
                                     <div className="booking-card-details">
@@ -161,7 +161,7 @@ const Booking = observer(() => {
 
                         {uniqueBooking.map((ad) => (
                             <div className="ad-info">
-                                <p>{ad.title}: {ad.price}</p>
+                                <p>{ad.title}: {ad.price}₽/день</p>
                             </div>
                         ))}
                     </div>

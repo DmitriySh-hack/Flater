@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
+import './ChangePasswordModal.css'
 
 export const ChangePasswordModal = ({
     isOpen,
@@ -28,40 +29,45 @@ export const ChangePasswordModal = ({
 
     return (
         <Modal isOpen={isOpen} isClose={isClose}>
-        <h2>Смена пароля</h2>
-        <form onSubmit={handleSumbit}>
-            <div className="form-group">
-                <label>Старый пароль:</label>
-                <input
-                    type="password"
-                    value={formData.oldPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, oldPassword: e.target.value }))}
-                    required
-                />
-                </div>
-                <div className="form-group">
-                <label>Новый пароль:</label>
-                <input
-                    type="password"
-                    value={formData.newPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
-                    required
-                />
+            <div className="change-password-modal">
+                <h2 className="change-password-modal-name">Смена пароля</h2>
+
+                <hr></hr>
+
+                <form className='change-password-modal-form' onSubmit={handleSumbit}>
+                    <div className="change-password-modal-old-password">
+                        <label>Старый пароль:</label>
+                        <input
+                            type="password"
+                            value={formData.oldPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, oldPassword: e.target.value }))}
+                            required
+                        />
+                    </div>
+                    <div className="change-password-modal-new-password">
+                        <label>Новый пароль: </label>
+                        <input
+                            type="password"
+                            value={formData.newPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                            required
+                        />
+                    </div>
+                    <div className="change-password-modal-accept-password">
+                        <label>Подтвердите пароль: </label>
+                        <input
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                            required
+                        />
+                    </div>
+                    <div className="change-password-modal-btn-container">
+                        <button className="change-password-modal-btn-change" type="submit">Сменить пароль</button>
+                        <button className="change-password-modal-btn-cancel" type="button" onClick={isClose}>Отмена</button>
+                    </div>
+                </form>    
             </div>
-            <div className="form-group">
-                <label>Подтвердите пароль:</label>
-                <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    required
-                />
-            </div>
-            <div className="modal-actions">
-                <button type="submit">Сменить пароль</button>
-                <button type="button" onClick={isClose}>Отмена</button>
-            </div>
-        </form>
         </Modal>
   );
 };

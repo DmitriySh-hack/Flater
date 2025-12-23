@@ -3,8 +3,9 @@ import { Modal } from '../../Profile/ModalPagePassword/Modal'
 import { useState, useEffect } from 'react'
 import type { IADVERTISMENT } from '../../models/IAdventisment';
 import type { IUSER } from '../../models/IUser'
+import './ModalInfo.css';
 
-export const ModalInfo = ({
+export const    ModalInfo = ({
     isOpen,
     isClose,
     advertisement
@@ -77,13 +78,19 @@ export const ModalInfo = ({
 
     return(
         <Modal isOpen={isOpen} isClose={isClose}>
-            <h2>Связь с продавцом</h2>
-            
-            <div className='infoContaoner'>
-                <div className='info-name'>Продавец: {getSellerName()}</div>
-                <div className='info-email'>Почта для связи: {getEmail()}</div>
+            <div className='modal-info-container'>
+                <h2 className='connectWithSeller'>Связь с продавцом</h2>
+                <hr></hr>
+                <div className='infoContainer'>
+                    <div className='info-name'>Продавец: {getSellerName()}</div>
+                    <div className='info-email'>Почта для связи: {getEmail()}</div>
+                </div>
+
+                <div className='writeLetterToOwner'>
+                    <button className='letterToOwnerBTN'>Написать продавцу</button>
+                </div>
             </div>
         </Modal>
-    )
+)
     
 }

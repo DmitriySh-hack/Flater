@@ -112,110 +112,118 @@ export const CreateAdvirtisment = ({
 
     return (
             <Modal isOpen={isOpen} isClose={isClose}>
-                <h2>Создание объявления</h2>
+                <div className='advertisement-create-modal'>
+                    <h2 className='advertisement-create-modal-name'>Создание объявления</h2>
 
-                <div>
-                    <div>Наименование</div>
-                    <input
-                        style={{marginBottom: '30px'}}
-                        value={formData.title}
-                        onChange={(e) => handleInputChange('title', e.target.value)}
-                        placeholder="Введите название"
-                    />
+                    <hr></hr>
 
-                    <div style={{marginBottom: '30px'}}>Число комнат: {
-                        <select
-                        value={formData.countOfRooms}
-                        onChange={(e) => handleInputChange('countOfRooms', parseInt(e.target.value))}
-                        >
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                            <option value={4}>4</option>
-                            <option value={5}>5</option>
-                            <option value={6}>6</option>
-                            <option value={7}>7</option>
-                        </select>
-                    }
-                    </div>
-                    
+                    <div className='advertisement-create-info'>
+                        <div className='advertisement-create-title-name'>Наименование:</div>
+                        <input
+                            className='advertisement-create-title'
+                            value={formData.title}
+                            onChange={(e) => handleInputChange('title', e.target.value)}
+                            placeholder="Введите название"
+                        />
 
-                    <div>Город:</div>
-                    <input
-                        style={{marginBottom: '30px'}}
-                        value={formData.city}
-                        onChange={(e) => handleInputChange('city', e.target.value)}
-                        placeholder="Введите город"
-                    />
-                    
-                    <div>Улица:</div>
-                    <input
-                        style={{marginBottom: '30px'}}
-                        value={formData.street}
-                        onChange={(e) => handleInputChange('street', e.target.value)}
-                        placeholder='Введите улицу'
-                    />
-
-                    <div>Цена:</div>
-                    <input
-                        type='number'
-                        style={{marginBottom: '30px'}}
-                        value={formData.price ?? ''}
-                        onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
-                        placeholder='Цена'
-                    />
-                </div>
-
-                <div className='photo-section'>
-                    <h1>Фотографии объявления</h1>
-
-                    <button
-                        onClick={openFileDialog}
-                    >
-                        Выбрать фотографии
-                    </button>
-
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleImageSelected}
-                        multiple
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                    />
-                </div>
-
-                {imagePreviews.length > 0 && (
-                    <div>
-                        <h4>Выбранные фотографии</h4>
-
-                        <div>
-                            {imagePreviews.map((preview, index) => (
-                                    <div key={index} className="preview-item">
-                                        <div className="preview-image-wrapper">
-                                            <img
-                                                src={preview}
-                                                alt={`Preview ${index + 1}`}
-                                                className="preview-image"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveImage(index)}
-                                                className="remove-image-btn"
-                                                title="Удалить"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                        <div className='advertisement-create-count-name'>Число комнат: {
+                            <select
+                            className='advertisement-create-count'
+                            value={formData.countOfRooms}
+                            onChange={(e) => handleInputChange('countOfRooms', parseInt(e.target.value))}
+                            >
+                                <option value={1}>1</option>
+                                <option value={2}>2</option>
+                                <option value={3}>3</option>
+                                <option value={4}>4</option>
+                                <option value={5}>5</option>
+                                <option value={6}>6</option>
+                                <option value={7}>7</option>
+                            </select>
+                        }
                         </div>
-                    </div>
-                )}
-                
+                        
 
-                <button onClick={handleCreate}>Создать</button>
-                <button onClick={isClose}>Отмена</button>
+                        <div className='advertisement-create-cities-name'>Город:</div>
+                        <input
+                            className='advertisement-create-cities'
+                            value={formData.city}
+                            onChange={(e) => handleInputChange('city', e.target.value)}
+                            placeholder="Введите город"
+                        />
+                        
+                        <div className='advertisement-create-street-name'>Улица:</div>
+                        <input
+                            className='advertisement-create-street'
+                            value={formData.street}
+                            onChange={(e) => handleInputChange('street', e.target.value)}
+                            placeholder='Введите улицу'
+                        />
+
+                        <div className='advertisement-create-price-name'>Цена:</div>
+                        <input
+                            className='advertisement-create-price'
+                            type='number'
+                            value={formData.price ?? ''}
+                            onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
+                            placeholder='Цена'
+                        />
+                    </div>
+
+                    <div className='photo-section'>
+                        <h1 className='advertisement-create-photo-name'>Фотографии объявления</h1>
+
+                        <button
+                            className='advertisement-create-choose-photo'
+                            onClick={openFileDialog}
+                        >
+                            Выбрать фотографии
+                        </button>
+
+                        <input
+                            className='advertisement-create-choose-photo-input'
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleImageSelected}
+                            multiple
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                        />
+                    </div>
+
+                    {imagePreviews.length > 0 && (
+                        <div>
+                            <h4 className='choosed-photos'>Выбранные фотографии:</h4>
+
+                            <div className='preview-scroll-photo-container'>
+                                {imagePreviews.map((preview, index) => (
+                                        <div key={index} className="preview-item">
+                                            <div className="preview-image-wrapper">
+                                                <img
+                                                    src={preview}
+                                                    alt={`Preview ${index + 1}`}
+                                                    className="preview-image"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveImage(index)}
+                                                    className="remove-image-btn"
+                                                    title="Удалить"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className='advertisement-create-btn-container'>
+                        <button className='advertisement-create-btn-create' onClick={handleCreate}>Создать</button>
+                        <button className='advertisement-create-btn-cancel' onClick={isClose}>Отмена</button>
+                    </div>
+                </div>
             </Modal>
     )
 }

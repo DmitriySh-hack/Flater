@@ -63,8 +63,8 @@
 }
 
 .booking-card-title{
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: 28px;
+    margin-bottom: 3px;
 }
 
 .articl{
@@ -100,4 +100,9 @@
 
 .res-word{
     font-size: 16px;
+}
+
+.booking-card-price{
+    font-weight: 600;
+    margin-bottom: 5px;
 }
