@@ -16,9 +16,9 @@ function HeaderSide() {
                 <li onClick={() => navigate('/advertisment')}>Сдать жилье</li>
                 <li onClick={() => navigate('/booking')}>Бронирование</li>
                 <li onClick={() => navigate('/favorite')}>Избранное</li>
-                <div className='profile' onClick={() => navigate('/profile')}>
+                <li className='profile' onClick={() => navigate('/profile')}>
                     Личный кабинет
-                </div>
+                </li>
             </ul>
         </div>
     )

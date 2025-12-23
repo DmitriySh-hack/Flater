@@ -95,3 +95,96 @@
     margin-top: 10px;
 }
 
+.input-first-name  {
+    padding: 3px;
+    font-size: 14px;
+    padding-left: 7px;  
+}
+
+.input-last-name{
+    padding: 3px;
+    font-size: 14px;
+    padding-left: 7px;
+}
+
+.input-email{
+    padding: 3px;
+    font-size: 14px;
+    padding-left: 7px;
+}
+
+.wellcome-words{
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 25px;
+    margin-top: 20px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.logout-btn{
+    padding: 4px;
+    background-color: #f5912b;
+    color: black;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.change-password-btn{
+    padding: 4px;
+    background-color: #f5912b;
+    color: black;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.save-changes-btn{
+    padding: 4px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 3px;
+}
+
+.delete-changes-btn{
+    padding: 4px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 3px;
+}
+
+.avatar-change-btn{
+    padding: 4px;
+    background-color: #f5912b;
+    color: black;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.avatar-camera-btn{
+    padding: 4px;
+    background-color: #f5912b;
+    color: black;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+}

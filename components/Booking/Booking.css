@@ -1,3 +1,4 @@
+
 .workPlace-container{
     display: flex;
     flex-direction: row;
@@ -8,13 +9,6 @@
     width: 1000px;
 }
 
-.costAd-container{
-    padding: 20px;
-    border: 3px solid black;
-    margin: 1px;
-    border-radius: 10px;
-}
-
 .booking-card{
     border: 3px solid black;
     margin: 3px;
@@ -23,6 +17,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .booking-card-main{
@@ -34,6 +29,12 @@
     margin-right: 25px;
 }
 
+.booking-card-imgStyle{
+    width: 150px;
+    aspect-ratio: 1 / 1;
+    border-radius: 15px;
+}
+
 .remove-booking-btn{
     height: 25px;
 }
@@ -42,6 +43,14 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex-shrink: 0;
+    width: 350px;
+    height: 500px;
+    padding: 20px;
+    border: 3px solid black;
+    margin: 1px;
+    border-radius: 10px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .costAd-price{
@@ -51,4 +60,44 @@
 
 .ad-info{
     margin-bottom: 3px;
+}
+
+.booking-card-title{
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.articl{
+    color: rgb(120, 120, 120);
+}
+
+.name-container{
+    margin: 25px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.booking-btn-container{
+    display: flex;
+    justify-content: right;
+    margin-top: 7px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.booking-btn{
+    padding: 4px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.costAd-set{
+    font-size: 18px;
+}
+
+.res-word{
+    font-size: 16px;
 }

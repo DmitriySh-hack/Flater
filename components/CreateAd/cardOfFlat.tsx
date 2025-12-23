@@ -56,7 +56,7 @@ export const CardOfFlat = observer((props: CardOfFlatProps) => {
     }
 
     return (
-        <div className='flar-card__container'>
+        <div className='flat-card__container'>
             <div className='flat-card__up-container'>
                 <div className="flat-card__image">
                     <img 
@@ -73,19 +73,27 @@ export const CardOfFlat = observer((props: CardOfFlatProps) => {
                 </div>
             </div>
 
-            <div className='flat-card__info'>
-                <span>Комнат: {countOfRooms}</span>
-                <span>Адрес: {city}, {street}</span>
+
+            <div className='flat-card__middle-container'>
+                <div className='flat-card__info'>
+                    <span>Комнат: {countOfRooms}</span>
+                    <span>Адрес: {city}, {street}</span>
+                </div>
+
+                <div className="flat-card__aricl">
+                    Артикул: {id}
+                </div>
             </div>
+            
 
             <div className='flat-card__rebuilder'>
-                <button style={{margin: '5px'}} onClick={handleOpenAd}>Редактировать</button>
+                <button className='edit-btn' onClick={handleOpenAd}>Редактировать</button>
                 <EditModal
                     isOpen = {openModal}
                     isClose = {handleCloseAd}
                     onEdit = {handleEditAd}
                 />
-                <button onClick={handleDeleteAd} style={{margin: '5px'}}>Удалить</button>
+                <button className='delete-btn' onClick={handleDeleteAd}>Удалить</button>
             </div>
         </div>
     )

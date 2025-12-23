@@ -166,6 +166,8 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
         );
     };
 
+    //let countOfObjects = filterAdvertisements.length;
+
     return (
         <div className="middle-side">
             {isLoading && (
@@ -215,16 +217,16 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                                     </div>
                                     <div className="ad-content">
                                         <div className="price-badge">
-                                            {formPrice(ad.price)} ₽/день
+                                            {formPrice(ad.price)}/день
                                         </div>
 
                                         <div className="ad-details">
                                             <div className="detail">
-                                                <span className="detail-label">Комнат:</span>
+                                                <span className="detail-label">Комнат: </span>
                                                 <span className="detail-value">{ad.countOfRooms}</span>
                                             </div>
                                             <div className="detail">
-                                                <span className="detail-label">Адрес:</span>
+                                                <span className="detail-label">Адрес: </span>
                                                 <span className="detail-value">{ad.city}, {ad.street}</span>
                                             </div>
                                             <div className='articul' style={{color: 'rgb(128, 128, 128)'}}>
@@ -235,8 +237,8 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                                 </div>
                             </div>
                             <div style={{margin: '5px', display:'flex', justifyContent: 'right', alignItems: 'end'}}>
-                                <button style={{marginRight: '4px'}} onClick={() => handleConnectWithSeller(ad)}>Связаться с продавцом</button>
-                                <button onClick={() => handleBookingToggle(ad.id)}>Забронировать</button>
+                                <button className = "connecting-btn" onClick={() => handleConnectWithSeller(ad)}>Связаться с продавцом</button>
+                                <button className = "booking-btn" onClick={() => handleBookingToggle(ad.id)} >Забронировать</button>
                             </div>
                         </div>
                     ))

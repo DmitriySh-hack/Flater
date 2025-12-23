@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import filter from '../Home/MainSide/filter.png'
 import { SearchModal } from './SearchModal';
+import './Serch.css'
 
 interface SearchProps {
     onSearch: (query: string) => void;
@@ -54,7 +55,7 @@ function Search({onSearch, searchValue} : SearchProps){
                     onChange={handleInputChange}
                 />
                 <button className="filter-button" onClick={handleFilter}>
-                    <img width="20px" src={filter} alt="Фильтр" />
+                    <img width="33px" src={filter} alt="Фильтр" />
                 </button>
 
                 <SearchModal

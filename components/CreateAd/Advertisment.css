@@ -1,0 +1,34 @@
+.advertisements-count{
+    font-size: 18px;
+}
+
+.advertisement-create-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;   
+}
+
+.advertisement-create-btn{
+    background-color: #f5912b;
+    border-radius: 5px;
+    margin-top: 4px;
+    font-size: 16px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    padding: 2px;
+}
+
+.advertisements-count{
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 24px;
+}
+
+.advertisement-container{
+    margin-top: 15px;
+}
+
+.your-ad{
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 24px;
+}

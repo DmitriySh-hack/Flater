@@ -53,18 +53,19 @@ export const Advertisment = observer(() => {
     if(store.isAuth){
         return(
             <div className='main-container'>
-                <div style={{fontSize: '18px'}}>Список Ваших объявлений: {store.userAdvertisment.length}</div>
+                <div className='advertisement-create-container'>
+                    <div className='advertisements-count'>Список Ваших объявлений: {store.userAdvertisment.length}</div>
 
-
-                <button onClick={() => setOpenModal(true)}>Создать объявление</button>
-                <CreateAdvirtisment
-                    isOpen = {openModal}
-                    isClose = {handleCloseAd}
-                    onCreate= {handleCreateAd}
-                />
-
+                    <button className='advertisement-create-btn' onClick={() => setOpenModal(true)}>Добавить объявление</button>
+                    <CreateAdvirtisment
+                        isOpen = {openModal}
+                        isClose = {handleCloseAd}
+                        onCreate= {handleCreateAd}
+                    />
+                </div>
+                
                 <div>
-                    <h3>Ваши объявления</h3>
+                    <h3 className='your-ad'>Ваши объявления</h3>
                     {store.userAdvertisment.length === 0 ? (
                         <p>У вас нет объявлений</p>
                     ) : (

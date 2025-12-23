@@ -3,13 +3,14 @@
     flex-direction: row;
 }
 
-.flar-card__container{
+.flat-card__container{
     border: 1px solid #e0e0e0;
     border-color: black;
     border-radius: 15px;
     padding: 15px;
     width: 700px;
     margin-bottom: 20px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .flat-card__image{
@@ -32,7 +33,34 @@
 }
 
 .flat-card__rebuilder{
-    padding-top: 5px;
     display: flex;
     justify-content: right;
+}
+
+.flat-card__aricl{
+    color: rgba(120, 120, 120);
+}
+
+.edit-btn{
+    margin: 3px;
+    padding: 4px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.delete-btn{
+    margin: 3px;
+    padding: 4px;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 5px;
 }

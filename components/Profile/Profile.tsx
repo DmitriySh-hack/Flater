@@ -94,40 +94,40 @@ export const Profile = observer(() => {
             <Avatar/>
             
             <div className='main-container'>
-                <p style={{fontWeight: 'bold', fontSize: '24px'}}>Добро пожаловать в профиль!</p>
+                <p className='wellcome-words'>Добро пожаловать в профиль!</p>
                 <div className='profile-form'>
                     <div className='first-name'>
-                        <input type="text" value={inputValue.firstName}
+                        <input className='input-first-name' type="text" value={inputValue.firstName}
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
                         />
                     </div>
 
                     <div className='last-name'>
-                        <input type="text" value={inputValue.lastName} 
+                        <input className='input-last-name' type="text" value={inputValue.lastName} 
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
                         />
                     </div>
 
                     <div className='email'>
-                        <input type="text" value={inputValue.email}
+                        <input className='input-email' type="text" value={inputValue.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}/>
                     </div>
 
                     
                         
                     <div className='down-buttons'>
-                        <button style={{cursor: 'pointer'}} onClick={() => {setIsChangePasswordModalOpen(true)}}>Изменить пароль</button>
-                        <button style={{cursor: 'pointer'}} onClick={() => {store.logout()}}>Выйти</button>
+                        <button className='change-password-btn' onClick={() => {setIsChangePasswordModalOpen(true)}}>Изменить пароль</button>
+                        <button className='logout-btn' onClick={() => {store.logout()}}>Выйти</button>
                     </div>    
                 </div>
                         
                 <div className='saveChangesProfile'><>
-                    <button style={{cursor: 'pointer'}} onClick={() => {
+                    <button className='save-changes-btn' style={{cursor: 'pointer'}} onClick={() => {
                         saveChanges('firstName');
                         saveChanges('lastName');
                         saveChanges('email');
                     }}>Сохранить изменения</button>
-                    <button style={{cursor: 'pointer'}} onClick={() => {
+                    <button className='delete-changes-btn' style={{cursor: 'pointer'}} onClick={() => {
                         cancelChanges('firstName');
                         cancelChanges('lastName');
                         cancelChanges('email');

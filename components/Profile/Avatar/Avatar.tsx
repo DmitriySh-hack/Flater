@@ -107,6 +107,7 @@ export const Avatar = () => {
             </div>
             <div>
                 <button 
+                    className='avatar-change-btn'
                     style={{cursor: isUploading ? 'not-allowed' : 'pointer', marginRight: '5px', opacity: isUploading ? 0.6 : 1}} 
                     onClick={handleUploadClick}
                     disabled={isUploading}
@@ -114,6 +115,7 @@ export const Avatar = () => {
                     {isUploading ? 'Загрузка...' : 'Изменить фото'}
                 </button>
                 <button 
+                    className='avatar-camera-btn'
                     style={{cursor: isUploading ? 'not-allowed' : 'pointer', opacity: isUploading ? 0.6 : 1}} 
                     onClick={handleCameraClick}
                     disabled={isUploading}

@@ -88,7 +88,7 @@ const Booking = observer(() => {
     return (
         <div className="main-container">
             <div className="name-container">
-                <h1>NAME</h1>
+                <h1>Бронирование</h1>
             </div>
             <div className="workPlace-container">
                 <div className="selectedAd-container">
@@ -104,7 +104,7 @@ const Booking = observer(() => {
                                         onError={(e) => {
                                             e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png';
                                         }}
-                                        style={{width: '150px'}}
+                                        className="booking-card-imgStyle"
                                     />
                                 </div>
                                 
@@ -136,7 +136,7 @@ const Booking = observer(() => {
                                         )}
 
                                         {ad.id && (
-                                            <div>
+                                            <div className="articl">
                                                 <span>Артикул:</span>
                                                 <span>{ad.id}</span>
                                             </div>
@@ -167,7 +167,7 @@ const Booking = observer(() => {
                     </div>
                     <div className="costAd-price">
                         <div>
-                            <p>Итог:</p>
+                            <p className="res-word">Итог:</p>
                             <p style={{fontWeight: 'bold', fontSize: '24px'}}>
                                 {uniqueBooking.reduce((sum, ad) => {
                                     const price = ad.price || 0;
@@ -175,8 +175,8 @@ const Booking = observer(() => {
                                 }, 0).toLocaleString('ru-RU')} ₽
                             </p>
                         </div>
-                        <div style={{display: 'flex', justifyContent: 'right', marginTop:'7px'}}>
-                            <button>Бронировать</button>
+                        <div className="booking-btn-container">
+                            <button className="booking-btn">Бронировать</button>
                         </div>
                         
                     </div>

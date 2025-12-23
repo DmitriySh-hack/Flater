@@ -84,72 +84,100 @@ const Favorite = observer(() => {
         return `http://localhost:5000${path}`;
     };
 
+    const handleBookingToggle = async(advertisementId: string) =>{
+        if(!store.isAuth){
+            alert('Войдите в систему, чтобы добавлять в избранное');
+            return;
+        }
+        try{
+            await store.toggleBooking(advertisementId)
+            alert("Объявление добавлено в корзину избранного")
+        }catch(error){
+            console.error(error)
+        }
+    }
+
      return (
          <div className="favorites-grid">
             <div className="favorites-grid-container">
                 {uniqueFavorites.map((ad) => (
                     <div key={`${ad.id}-${Math.random()}`} className="favorite-card">
-                        <div style={{display: 'flex', flexDirection: 'row'}}>
-                            <div className="favorite-card-image">
-                                <img 
-                                    src={ad.images && ad.images.length > 0 
-                                        ? getImageUrl(ad.images[0]) 
-                                        : 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png'}
-                                    alt={ad.title}
-                                    onError={(e) => {
-                                        e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png';
-                                    }}
-                                    style={{width: '150px'}}
-                                />
-                            </div>
-                            
-                            <div className="favorite-card-content">
-                                <h3 className="favorite-card-title">{ad.title}</h3>
-                                
-                                <div className="favorite-card-price">
-                                    {ad.price.toLocaleString('ru-RU')} ₽
+                        <div>
+                            <div style={{display: 'flex', flexDirection: 'row'}}>
+                                <div className="favorite-card-image">
+                                    <img 
+                                        src={ad.images && ad.images.length > 0 
+                                            ? getImageUrl(ad.images[0]) 
+                                            : 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png'}
+                                        alt={ad.title}
+                                        onError={(e) => {
+                                            e.currentTarget.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png';
+                                        }}
+                                        style={{width: '150px'}}
+                                    />
                                 </div>
                                 
-                                <div className="favorite-card-details">
-                                    <div className="detail-item">
-                                        <span className="detail-label">Город:</span>
-                                        <span className="detail-value">{ad.city}</span>
+                                <div className="favorite-card-content">
+                                    <h3 className="favorite-card-title">{ad.title}</h3>
+                                    
+                                    <div className="favorite-card-price">
+                                        {ad.price.toLocaleString('ru-RU')} ₽/месяц
                                     </div>
                                     
-                                    {ad.street && (
+                                    <div className="favorite-card-details">
                                         <div className="detail-item">
-                                            <span className="detail-label">Адрес:</span>
-                                            <span className="detail-value">{ad.street}</span>
+                                            <span className="detail-label">Город: </span>
+                                            <span className="detail-value">{ad.city}</span>
                                         </div>
-                                    )}
-                                    
-                                    {ad.countOfRooms && (
-                                        <div className="detail-item">
-                                            <span className="detail-label">Комнат:</span>
-                                            <span className="detail-value">{ad.countOfRooms}</span>
-                                        </div>
-                                    )}
+                                        
+                                        {ad.street && (
+                                            <div className="detail-item">
+                                                <span className="detail-label">Адрес: </span>
+                                                <span className="detail-value">{ad.street}</span>
+                                            </div>
+                                        )}
+                                        
+                                        {ad.countOfRooms && (
+                                            <div className="detail-item">
+                                                <span className="detail-label">Комнат: </span>
+                                                <span className="detail-value">{ad.countOfRooms}</span>
+                                            </div>
+                                        )}
 
-                                    {ad.id && (
-                                        <div>
-                                            <span>Артикул:</span>
-                                            <span>{ad.id}</span>
-                                        </div>
-                                    )}
+                                        {ad.id && (
+                                            <div className="articl">
+                                                <span>Артикул:</span>
+                                                <span>{ad.id}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <button 
-                            className="remove-favorite-btn"
-                            onClick={() => handleRemoveFromFavorite(ad.id)}
-                            title="Удалить из избранного"
-                        >
-                            ❌
-                        </button>
+                        <div className="favorite-booking-btn-container">
+                            <div className="favorite-x-btn">
+                                <button 
+                                    className="remove-favorite-btn"
+                                    onClick={() => handleRemoveFromFavorite(ad.id)}
+                                    title="Удалить из избранного"
+                                >
+                                    ❌
+                                </button>
+                            </div>
+                            
+
+                            <div>
+                                <button className="booking-btn" onClick={() => handleBookingToggle(ad.id)}>Забронировать</button>
+                            </div>
+                        </div>
+                            
                     </div>
+                    
                 ))}
-            </div>       
+                
+            </div>
+
+                  
         </div>
     );
 })
