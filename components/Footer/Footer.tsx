@@ -13,7 +13,7 @@ function Footer(){
             </div>
             <div className='company-info'>
                 <div>Контакты: flatercompanymain@gmail.com</div>
-                <div>Служба поддержки:flaterCSup@gmail.com</div>
+                <div>Служба поддержки: flaterCSup@gmail.com</div>
             </div>
         </div>
     )

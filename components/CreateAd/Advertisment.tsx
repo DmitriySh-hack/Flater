@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext, useState, useEffect } from 'react';
 import { Context } from '../../src/main';
-import { useNavigate } from 'react-router-dom';
 import { CreateAdvirtisment } from './CreateAdvertismentModal/Modal'
 import { CardOfFlat } from './cardOfFlat'
 import './Advertisment.css'
+import { useNavigate } from 'react-router-dom';
 
 interface CreateAdData {
     title: string;
@@ -82,10 +82,15 @@ export const Advertisment = observer(() => {
         
     }
 
-    return (
-        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', fontSize: '24px'}}>
-            <div>Войдите в аккаунт</div>
-            <button onClick={() => {navigate('/login')}}>Войти</button>
-        </div>
-    )
+    if (!store.isAuth) {
+        return (
+            <div className="favorite-container">
+                <div className="auth-required">
+                    <h2 style={{fontSize: '32px'}}>Требуется авторизация</h2>
+                    <p className='string-of-info'>Для создания объявления необходимо войти в систему</p>
+                    <button onClick={() => navigate('/login')} className="login-link">Войти</button>
+                </div>
+            </div>
+        );
+    }
 })

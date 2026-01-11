@@ -2,8 +2,10 @@ import { useEffect, useContext, useMemo, useState } from "react";
 import { Context } from '../../src/main';
 import './Favorite.css'
 import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router-dom";
 
 const Favorite = observer(() => {
+    const navigate = useNavigate()
     const {store} = useContext(Context)
     const [isLoading, setIsLoading] = useState(true);
 
@@ -72,9 +74,9 @@ const Favorite = observer(() => {
         return (
             <div className="favorite-container">
                 <div className="auth-required">
-                    <h2>Требуется авторизация</h2>
-                    <p>Для просмотра избранных объявлений необходимо войти в систему</p>
-                    <a href="/login" className="login-link">Войти</a>
+                    <h2 style={{fontSize: '32px'}}>Требуется авторизация</h2>
+                    <p className='string-of-info'>Для просмотра избранного необходимо войти в систему</p>
+                    <button onClick={() => navigate('/login')} className="login-link">Войти</button>
                 </div>
             </div>
         );

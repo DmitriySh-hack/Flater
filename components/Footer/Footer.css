@@ -8,6 +8,7 @@
   align-items: center;
   box-sizing: border-box;
   margin-top: auto;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .Logo {
@@ -19,6 +20,6 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  font-size: 14px;
+  font-size: 16px;
   text-align: right;
 }

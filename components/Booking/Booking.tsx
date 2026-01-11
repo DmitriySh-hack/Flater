@@ -2,8 +2,10 @@ import { observer } from "mobx-react-lite";
 import './Booking.css'
 import { Context } from '../../src/main';
 import { useContext, useMemo, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Booking = observer(() => {
+    const navigate = useNavigate()
     const {store} = useContext(Context)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -73,9 +75,9 @@ const Booking = observer(() => {
         return (
             <div className="favorite-container">
                 <div className="auth-required">
-                    <h2>Требуется авторизация</h2>
-                    <p>Для просмотра избранных объявлений необходимо войти в систему</p>
-                    <a href="/login" className="login-link">Войти</a>
+                    <h2 style={{fontSize: '32px'}}>Требуется авторизация</h2>
+                    <p className='string-of-info'>Для бронирования необходимо войти в систему</p>
+                    <button onClick={() => navigate('/login')} className="login-link">Войти</button>
                 </div>
             </div>
         );
