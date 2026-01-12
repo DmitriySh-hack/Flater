@@ -71,9 +71,12 @@ export const Profile = observer(() => {
     if(!store.isAuth){
         return (
             <div className='no-Auth-Profile'>
-                <div style={{fontSize: '30px'}}>Вы не авторизованы!</div>
-                <button onClick={() => navigate('/login')}>Войти</button>
-                <button onClick={() => navigate('/registration')}>Зарегистрироваться</button>
+                <div style={{fontSize: '30px', padding: '3px', fontWeight: 'bold'}}>Вы не авторизованы!</div>
+                <div className='buttons-for-no-auth'>
+                    <button style={{marginRight: '3px'}} onClick={() => navigate('/login')}>Войти</button>
+                    <button onClick={() => navigate('/registration')}>Зарегистрироваться</button>
+                </div>
+                
             </div>
         )
     }

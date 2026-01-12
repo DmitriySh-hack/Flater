@@ -31,3 +31,11 @@
     width: 150px;
     cursor: pointer;
 }
+
+.messageLogo{
+    width: 25px;
+    cursor: pointer;
+}
+.messageLogo:hover{
+    transform: scale(1.1);
+}

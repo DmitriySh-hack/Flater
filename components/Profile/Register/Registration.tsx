@@ -23,10 +23,14 @@ export const Registration = () => {
     }
 
     return (
-        <div>
+        <div className='form-container'>
+
+            <div className='form-name'>Регистрация</div>
+
             <div>
                 <p>Имя:</p>
                 <input 
+                    style={{width:'350px', height:'20px', margin:'3px', borderRadius:'4px', border: 'none', paddingLeft:'5px'}}
                     placeholder="Имя"
                     onChange={e => setFirstName(e.target.value)}
                     value={firstName}
@@ -34,6 +38,7 @@ export const Registration = () => {
 
                 <p>Фамилия:</p>
                 <input 
+                    style={{width:'350px', height:'20px', margin:'3px', borderRadius:'4px', border: 'none', paddingLeft:'5px'}}
                     placeholder="Фамилия"
                     onChange={e => setLastName(e.target.value)}
                     value={lastName}
@@ -41,6 +46,7 @@ export const Registration = () => {
 
                 <p>Email:</p>
                 <input 
+                    style={{width:'350px', height:'20px', margin:'3px', borderRadius:'4px', border: 'none', paddingLeft:'5px'}}
                     placeholder="Email" 
                     onChange={e => setEmail(e.target.value)} 
                     value={email}
@@ -48,13 +54,15 @@ export const Registration = () => {
                 
                 <p>Пароль:</p>
                 <input 
+                    style={{width:'350px', height:'20px', margin:'3px', borderRadius:'4px', border: 'none', paddingLeft:'5px'}}
                     placeholder="Пароль"
                     type='password'
                     onChange={e => setPassword(e.target.value)}
                     value={password}
                 />
 
-                <button onClick={() => {
+                <button style={{padding:'3px', borderRadius:'6px', backgroundColor: '#f5912b', marginTop:'40px', cursor: 'pointer', fontSize:'14px'}} 
+                onClick={() => {
                     store.registration(email, password, firstName, lastName);
                     navigator('/login')
                 }}>Создать аккаунт</button>

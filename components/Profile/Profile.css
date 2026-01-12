@@ -1,8 +1,15 @@
 .no-Auth-Profile{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    position: absolute;
+    top: 38%;
+    left: 45%;
+    text-align: center;
+}
+
+.buttons-for-no-auth button{
+    border-radius: 5px;
+    padding: 2px;
+    background-color: #f5912b;
+    cursor: pointer;
 }
 
 .main-page{

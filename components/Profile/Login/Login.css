@@ -1,0 +1,35 @@
+.form-container{
+    position: absolute;
+    left: 42%;
+    top:25%;
+    border-radius: 15px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(128, 128, 128, 0.882);
+    width: 400px;
+    height: 400px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.active-form-part{
+    display: flex;
+    flex-direction: column;
+}
+
+.login-button-container button{
+    padding: 3px;
+    border-radius: 6px;
+    background-color: #f5912b;
+    margin: 3px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.form-name{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
