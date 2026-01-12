@@ -4,17 +4,28 @@ import { useState, useEffect } from 'react'
 import type { IADVERTISMENT } from '../../models/IAdventisment';
 import type { IUSER } from '../../models/IUser'
 import './ModalInfo.css';
+import { useNavigate } from 'react-router-dom';
 
-export const    ModalInfo = ({
+export const ModalInfo = ({
     isOpen,
     isClose,
     advertisement
-} : {
+}: {
     isOpen: boolean,
     isClose: () => void,
     advertisement: IADVERTISMENT | null;
 }) => {
     const [userInfo, setUserInfo] = useState<IUSER | null>(null)
+
+    const navigate = useNavigate()
+
+    const handleWriteToSeller = () => {
+        const user = userInfo || advertisement?.user
+        if(user && user.id){
+            navigate(`/message/${user.id}`);
+            isClose();
+        }
+    }
 
     useEffect(() => {
         if (isOpen && advertisement) {
@@ -30,10 +41,10 @@ export const    ModalInfo = ({
 
     const loadUserInfo = async () => {
         if (!advertisement?.id) return;
-        
+
         try {
             console.log('🔍 ModalInfo: Loading user info for advertisement:', advertisement.id);
-            
+
             // Используем новый эндпоинт
             const response = await fetch(`http://localhost:5000/api/advertisements/${advertisement.id}/with-user`, {
                 method: 'GET',
@@ -42,7 +53,7 @@ export const    ModalInfo = ({
                     'Authorization': `Bearer ${localStorage.getItem('token')}` // если нужно
                 }
             });
-            
+
             if (response.ok) {
                 const data = await response.json();
                 console.log('✅ ModalInfo: Got user info:', data.user);
@@ -57,9 +68,9 @@ export const    ModalInfo = ({
 
     const getSellerName = () => {
         const user = userInfo || advertisement?.user;
-        
+
         if (!user) return "Продавец";
-        
+
         if (user.firstName && user.lastName) {
             return `${user.firstName} ${user.lastName}`;
         } else if (user.firstName) {
@@ -76,7 +87,7 @@ export const    ModalInfo = ({
         return advertisement?.user?.email
     }
 
-    return(
+    return (
         <Modal isOpen={isOpen} isClose={isClose}>
             <div className='modal-info-container'>
                 <h2 className='connectWithSeller'>Связь с продавцом</h2>
@@ -87,10 +98,10 @@ export const    ModalInfo = ({
                 </div>
 
                 <div className='writeLetterToOwner'>
-                    <button className='letterToOwnerBTN'>Написать продавцу</button>
+                    <button className='letterToOwnerBTN' onClick={handleWriteToSeller}>Написать продавцу</button>
                 </div>
             </div>
         </Modal>
-)
-    
+    )
+
 }

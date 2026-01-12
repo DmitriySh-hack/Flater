@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const router = require('./router/index.cjs')
 const errorMiddleware = require('./middleware/error-middleware.cjs');
 const { getPool } = require('./db-mssql.cjs');
+const startWebSocket = require('./messages/websocket.cjs')
 
 const PORT = process.env.PORT || 5001
 
@@ -30,7 +31,9 @@ app.get('/users', (req, res) => {
 const start = async () => {
     try{
         await getPool();//Соединение с БД при запуске бэка
-        app.listen(PORT, () => console.log(`Server ${PORT} started`))
+        const server = app.listen(PORT, () => console.log(`Server ${PORT} started`))
+
+        startWebSocket(server)
     }catch (error){
         process.exit(1)
     }

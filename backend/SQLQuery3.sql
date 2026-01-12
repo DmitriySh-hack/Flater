@@ -50,3 +50,18 @@ CREATE TABLE booking_advertisement (
     advertisement_id NVARCHAR(100) NOT NULL,
     create_at DATETIME DEFAULT GETDATE()
 );
+
+CREATE TABLE messages (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    senderId NVARCHAR(50) NOT NULL,    -- ID отправителя (FK на users)
+    recipientId NVARCHAR(50) NOT NULL, -- ID получателя (FK на users)
+    content NVARCHAR(MAX) NOT NULL,    -- Текст сообщения
+    isRead BIT DEFAULT 0,              -- Прочитано ли (0 - нет, 1 - да)
+    createdAt DATETIME2 DEFAULT SYSUTCDATETIME(),
+    
+    FOREIGN KEY (senderId) REFERENCES dbo.[users](id), -- Опционально, но полезно для целостности
+    FOREIGN KEY (recipientId) REFERENCES dbo.[users](id)
+);
+-- Индексы для ускорения поиска переписки (ОЧЕНЬ ВАЖНО)
+CREATE INDEX IX_messages_sender_recipient ON messages(senderId, recipientId);
+CREATE INDEX IX_messages_recipient_sender ON messages(recipientId, senderId);

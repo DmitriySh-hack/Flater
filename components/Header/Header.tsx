@@ -14,7 +14,7 @@ function HeaderSide() {
             </div>
             
             <div className='active-part' style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
-                <div className='message-element' style={{paddingRight: '30px'}} onClick={() => navigate('')}>
+                <div className='message-element' style={{paddingRight: '30px'}} onClick={() => navigate('/message')}>
                     <img className='messageLogo' src={messageLogo}/>
                 </div>   
 
@@ -22,9 +22,7 @@ function HeaderSide() {
                     <li onClick={() => navigate('/advertisment')}>Сдать жилье</li>
                     <li onClick={() => navigate('/booking')}>Бронирование</li>
                     <li onClick={() => navigate('/favorite')}>Избранное</li>
-                    <li className='profile' onClick={() => navigate('/profile')}>
-                        Личный кабинет
-                    </li>
+                    <li onClick={() => navigate('/profile')}>Личный кабинет</li>
                 </ul>
             </div>
         </div>

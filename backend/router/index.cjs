@@ -2,13 +2,14 @@ const Router = require('express').Router;
 const userController = require('../controllers/user-controller.cjs')
 const advertisementController = require('../advertisement/advertisment-controller.cjs')
 const router = new Router();
-const {body} = require('express-validator')
+const { body } = require('express-validator')
 const authMidddleware = require('../middleware/auth-middleware.cjs');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const FavoriteAdvertisementController = require('../favorite-advertisement/favorite-advertisement-controller.cjs')
 const BookingAdvertisementController = require('../booking-advertisement/booking-controller.cjs')
+const MessageController = require('../messages/message-controller.cjs')
 
 //Создание директории аватарки
 const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
@@ -22,8 +23,8 @@ if (!fs.existsSync(adUploadsDir)) {
 }
 
 //Проверка, что файл подходит, как по размеру, так и по формату
-const upload = multer({ 
-    storage: multer.memoryStorage(), 
+const upload = multer({
+    storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/')) {
@@ -34,7 +35,7 @@ const upload = multer({
     }
 });
 
-const adUpload = multer({ 
+const adUpload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => {
             cb(null, adUploadsDir);
@@ -55,7 +56,7 @@ const adUpload = multer({
 });
 
 //Всевозможные особенные переходы между страницами
-router.post('/registration', body('email').isEmail(), body('password').isLength({min: 3, max: 16}), userController.registration);
+router.post('/registration', body('email').isEmail(), body('password').isLength({ min: 3, max: 16 }), userController.registration);
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.get('/activate/:link', userController.activate);
@@ -83,5 +84,11 @@ router.delete('/favorites/:advertisementId', authMidddleware, FavoriteAdvertisem
 router.post('/booking', authMidddleware, BookingAdvertisementController.bookingAdvertisement);
 router.get('/booking', authMidddleware, BookingAdvertisementController.getBooking);
 router.delete('/booking/:advertisementId', authMidddleware, BookingAdvertisementController.deleteBookingAdvertisemnt)
+
+
+
+router.get('/dialogs', authMidddleware, MessageController.getDialogs);
+router.get('/message/:userId', authMidddleware, MessageController.getHistory);
+
 
 module.exports = router
