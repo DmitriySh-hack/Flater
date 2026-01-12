@@ -3,8 +3,8 @@ const MessageModal = require('./message-modal.cjs')
 const ApiError = require('../exceptions/api-error.cjs');
 
 class MessageService {
-    async getHistory(user1Id, user2Id) {
-        const messages = await MessageModal.getMessages(user1Id, user2Id);
+    async getHistory(user1Id, user2Id, advertisementId) {
+        const messages = await MessageModal.getMessages(user1Id, user2Id, advertisementId);
         return messages.map(msg => new MessageDTO(msg));
     }
 
@@ -12,8 +12,8 @@ class MessageService {
         return await MessageModal.getDialogs(userId);
     }
 
-    async saveMessage(senderId, recipientId, content) {
-        return await MessageModal.saveMessage(senderId, recipientId, content);
+    async saveMessage(senderId, recipientId, content, advertisementId) {
+        return await MessageModal.saveMessage(senderId, recipientId, content, advertisementId);
     }
 }
 

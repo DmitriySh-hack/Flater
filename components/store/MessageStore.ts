@@ -15,6 +15,8 @@ export interface IDialog {
     lastName: string;
     email: string;
     avatarUrl?: string;
+    advertisementId?: string;
+    advertisementTitle?: string;
 }
 
 class MessageStore {
@@ -45,7 +47,6 @@ class MessageStore {
             this.socket?.close()
         }
 
-        // Используем порт 5000, так как там же работает API
         this.socket = new WebSocket('ws://localhost:5000?token=' + token)
         this.socket.onopen = () => {
             console.log('WebSocket connected!')
@@ -72,29 +73,43 @@ class MessageStore {
         }
     }
 
-    sendMessage(senderId: string, recipientId: string, content: string) {
+    sendMessage(senderId: string, recipientId: string, content: string, advertisementId?: string) {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            this.socket.send(JSON.stringify({
+            const payload: {
+                event: string;
+                recipientId: string;
+                content: string;
+                advertisementId?: string;
+            } = {
                 event: 'message',
                 recipientId,
                 content
-            }))
+            };
+            // Если есть ID объявления, отправляем его
+            if (advertisementId) {
+                payload.advertisementId = advertisementId;
+            }
+            this.socket.send(JSON.stringify(payload));
 
+            // Локальное добавление (можно также добавить поля adId если нужно отображать)
             this.addMessage({
                 senderId,
                 recipientId,
                 content,
                 createdAt: new Date().toISOString()
             });
+            setTimeout(() => this.fetchDialogs(), 500);
         } else {
             console.error('Socket not connected')
         }
     }
 
-    async fetchHistory(userId: string) {
+    async fetchHistory(userId: string, advertisementId?: string) {
         try {
-            // Используем настроенный $api для корректного baseURL и заголовков
-            const response = await $api.get(`/message/${userId}`);
+            const url = advertisementId
+                ? `/message/${userId}?adId=${advertisementId}`
+                : `/message/${userId}`;
+            const response = await $api.get(url);
             this.setMessage(response.data);
         } catch (e) {
             console.error('Failed to load history', e)

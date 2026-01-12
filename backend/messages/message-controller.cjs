@@ -5,8 +5,9 @@ class MessageController {
         try {
             const myId = req.user.id;
             const otherId = req.params.userId;
+            const advertisementId = req.query.adId;
 
-            const messages = await MessageService.getHistory(myId, otherId);
+            const messages = await MessageService.getHistory(myId, otherId, advertisementId);
             return res.json(messages);
         } catch (e) {
             next(e);

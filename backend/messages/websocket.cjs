@@ -36,9 +36,9 @@ function startWebSocket(server) {
                 const message = JSON.parse(messageStr)
 
                 if (message.event === 'message') {
-                    const { recipientId, content } = message;
+                    const { recipientId, content, advertisementId } = message;
 
-                    await MessageService.saveMessage(userId, recipientId, content);
+                    await MessageService.saveMessage(userId, recipientId, content, advertisementId);
 
                     const recipientWs = clients.get(recipientId)
                     if (recipientWs && recipientWs.readyState === ws.OPEN) {
@@ -46,6 +46,7 @@ function startWebSocket(server) {
                             event: 'message',
                             senderId: userId,
                             content: content,
+                            advertisementId: advertisementId,
                             createAt: new Date().toISOString()
                         }))
                     }

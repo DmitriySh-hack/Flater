@@ -21,8 +21,12 @@ export const ModalInfo = ({
 
     const handleWriteToSeller = () => {
         const user = userInfo || advertisement?.user
-        if(user && user.id){
-            navigate(`/message/${user.id}`);
+        if (user && user.id) {
+            if (advertisement?.title) {
+                localStorage.setItem(`ad_context_${user.id}`, advertisement.title);
+            }
+            // Переходим с adId
+            navigate(`/message/${user.id}?adId=${advertisement?.id || ''}`);
             isClose();
         }
     }
