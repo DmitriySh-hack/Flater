@@ -128,6 +128,27 @@ class MessageStore {
             console.error('Failed to load dialogs', e)
         }
     }
+
+    async deleteDialog(dialogId: string, advertisementId?: string) {
+        try {
+            const url = advertisementId
+                ? `/dialogs/${dialogId}?adId=${advertisementId}`
+                : `/dialogs/${dialogId}`;
+
+            await $api.delete(url)
+
+            this.dialogs = this.dialogs.filter(d => {
+                if (advertisementId) {
+                    return !(d.id === dialogId && d.advertisementId === advertisementId);
+                }
+                return d.id !== dialogId;
+            });
+
+            this.messages = [];
+        } catch (e) {
+            console.error('Failed to delete dialog', e);
+        }
+    }
 }
 
 export default new MessageStore

@@ -88,6 +88,7 @@ router.delete('/booking/:advertisementId', authMidddleware, BookingAdvertisement
 
 
 router.get('/dialogs', authMidddleware, MessageController.getDialogs);
+router.delete('/dialogs/:userId', authMidddleware, MessageController.deleteDialog);
 router.get('/message/:userId', authMidddleware, MessageController.getHistory);
 
 

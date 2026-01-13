@@ -7,15 +7,20 @@ import { Advertisment } from '../components/CreateAd/Advertisment'
 import { Login } from '../components/Profile/Login/Login'
 import { Registration } from '../components/Profile/Register/Registration'
 import Favorite from '../components/FavoritePage/Favorite'
-import { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
 import './App.css'
 import { FilterProvider } from '../components/Home/FilterContext/FilterContext'
 import Booking from '../components/Booking/Booking'
 import Messages from '../components/Message/Messages'
+import { Context } from '../src/main';
 
 function App() {
 
   const location = useLocation()
+
+  const isMessagePage = location.pathname.startsWith('/message');
+
+  const {store} = useContext(Context)
 
   useEffect(() => {
     function scrollSetting() {
@@ -69,7 +74,7 @@ function App() {
           <Route path='/message/:id' element={<Messages />} />
         </Routes>
       </main>
-      <Footer />
+      {(!isMessagePage || !store.isAuth) && <Footer />}
     </div>
   )
 }

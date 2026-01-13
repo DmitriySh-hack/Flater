@@ -12,6 +12,10 @@ class MessageService {
         return await MessageModal.getDialogs(userId);
     }
 
+    async deleteDialog(user1Id, user2Id, advertisementId) {
+        return await MessageModal.deleteDialog(user1Id, user2Id, advertisementId);
+    }
+
     async saveMessage(senderId, recipientId, content, advertisementId) {
         return await MessageModal.saveMessage(senderId, recipientId, content, advertisementId);
     }

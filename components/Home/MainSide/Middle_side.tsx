@@ -5,6 +5,7 @@ import {ModalInfo} from './ModalInfo'
 import type { IADVERTISMENT } from '../../models/IAdventisment';
 import { observer } from 'mobx-react-lite';
 import { useFilterContext } from '../FilterContext/useFilterContext';
+import { useNavigate } from 'react-router-dom';
 
 interface MiddleSideProps {
     searchQuery?: string;
@@ -13,6 +14,8 @@ interface MiddleSideProps {
 const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
     const {store} = useContext(Context)
     const [isLoading, setIsLoading] = useState(false)
+
+    const navigate = useNavigate()
 
     const {filters} = useFilterContext()
 
@@ -74,6 +77,9 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
     }, [store.publicAdvertisements, searchQuery, filters]);
 
     const handleConnectWithSeller = (ad: IADVERTISMENT) => {
+        if (!store.isAuth) {
+            navigate('/message')
+        }
         setSelectedAdvertisement(ad);
         setConnectWithSeller(true);
     }
@@ -109,8 +115,7 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
 
     const handleFavoriteToggle = async (advertisementId: string) => {
         if (!store.isAuth) {
-            alert('Войдите в систему, чтобы добавлять в избранное');
-            return;
+            navigate('/favorite')
         }
         try {
             await store.toggleFavorite(advertisementId);
@@ -121,8 +126,7 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
 
     const handleBookingToggle = async (advertisementId: string) => {
         if(!store.isAuth){
-            alert('Войдите в систему, чтобы добавлять в избранное');
-            return;
+            navigate('/booking')
         }
         try{
             await store.toggleBooking(advertisementId)

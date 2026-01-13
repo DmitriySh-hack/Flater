@@ -44,6 +44,24 @@ class MessageModal {
         return res.recordset
     }
 
+    async deleteDialog(user1Id, user2Id, advertisementId) {
+        let sqlQuery = `DELETE FROM messages 
+              WHERE ((senderId = @user1Id AND recipientId = @user2Id) 
+                 OR (senderId = @user2Id AND recipientId = @user1Id))`;
+
+        const params = [
+            { name: 'user1Id', type: sql.NVarChar, value: user1Id },
+            { name: 'user2Id', type: sql.NVarChar, value: user2Id }
+        ];
+
+        if (advertisementId) {
+            sqlQuery += ` AND advertisementId = @advertisementId`;
+            params.push({ name: 'advertisementId', type: sql.NVarChar, value: advertisementId });
+        }
+
+        await query(sqlQuery, params);
+    }
+
     async saveMessage(senderId, recipientId, content, advertisementId) {
         await query(
             `INSERT INTO messages (senderId, recipientId, content, advertisementId) 

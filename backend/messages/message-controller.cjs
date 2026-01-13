@@ -23,6 +23,19 @@ class MessageController {
             next(e);
         }
     }
+
+    async deleteDialog(req, res, next) {
+        try {
+            const myId = req.user.id;
+            const otherId = req.params.userId;
+            const advertisementId = req.query.adId;
+
+            await MessageService.deleteDialog(myId, otherId, advertisementId);
+            return res.json({ success: true });
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 module.exports = new MessageController()
