@@ -23,20 +23,21 @@ class MessageModal {
 
     async getDialogs(userId) {
         const res = await query(
-            `SELECT DISTINCT 
+            `SELECT 
                 u.id, 
                 u.firstName, 
                 u.lastName, 
                 u.email, 
                 u.avatarUrl,
                 m.advertisementId,
-                a.title as advertisementTitle
+                MAX(a.title) as advertisementTitle,
+                SUM(CASE WHEN m.recipientId = @userId AND m.senderId = u.id AND m.isRead = 0 THEN 1 ELSE 0 END) as unreadCount
              FROM users u
              JOIN messages m ON (m.senderId = u.id AND m.recipientId = @userId) 
                              OR (m.recipientId = u.id AND m.senderId = @userId)
              LEFT JOIN advertisements a ON m.advertisementId = a.id
              WHERE m.senderId = @userId OR m.recipientId = @userId
-             GROUP BY u.id, u.firstName, u.lastName, u.email, u.avatarUrl, m.advertisementId, a.title`,
+             GROUP BY u.id, u.firstName, u.lastName, u.email, u.avatarUrl, m.advertisementId`,
             [
                 { name: 'userId', type: sql.NVarChar, value: userId }
             ]
@@ -73,6 +74,31 @@ class MessageModal {
                 { name: 'advertisementId', type: sql.NVarChar, value: advertisementId || null }
             ]
         );
+    }
+
+    async markReaded(messageId, userId) {
+        await query(
+            `UPDATE messages SET isRead = 1
+            WHERE id = @messageId
+                AND recipientId = @userId 
+                AND isRead = 0`,
+            [
+                { name: 'messageId', type: sql.Int, value: messageId },
+                { name: 'userId', type: sql.NVarChar, value: userId }
+            ]
+        )
+    }
+
+    async countRead(userId) {
+        const res = await query(
+            `SELECT COUNT(*) as count 
+             FROM messages 
+             WHERE recipientId = @userId AND isRead = 0`,
+            [
+                { name: 'userId', type: sql.NVarChar, value: userId }
+            ]
+        );
+        return res.recordset[0].count;
     }
 }
 

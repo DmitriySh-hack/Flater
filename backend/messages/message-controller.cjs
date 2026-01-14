@@ -36,6 +36,17 @@ class MessageController {
             next(e);
         }
     }
+
+    async markRead(req, res, next) {
+        try {
+            const userId = req.user.id;
+            const messageId = parseInt(req.params.messageId)
+            await MessageService.markRead(messageId, userId)
+            return res.json({ success: true })
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 module.exports = new MessageController()

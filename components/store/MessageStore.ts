@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import $api from "../http";
 
 export interface IMessage {
@@ -6,6 +6,7 @@ export interface IMessage {
     senderId: string;
     recipientId: string;
     content: string;
+    isRead: boolean;
     createdAt?: string;
 }
 
@@ -17,6 +18,7 @@ export interface IDialog {
     avatarUrl?: string;
     advertisementId?: string;
     advertisementTitle?: string;
+    unreadCount: number
 }
 
 class MessageStore {
@@ -56,12 +58,24 @@ class MessageStore {
             try {
                 const msg = JSON.parse(event.data);
                 if (msg.event === 'message') {
-                    this.addMessage({
-                        senderId: msg.senderId,
-                        recipientId: '',
-                        content: msg.content,
-                        createdAt: msg.createdAt
-                    })
+                    runInAction(() => {
+                        this.addMessage({
+                            senderId: msg.senderId,
+                            recipientId: '',
+                            content: msg.content,
+                            isRead: msg.isRead,
+                            createdAt: msg.createdAt
+                        });
+
+                        // Обновляем счетчик непрочитанных в списке диалогов
+                        const dialog = this.dialogs.find(d =>
+                            d.id === msg.senderId &&
+                            (d.advertisementId === msg.advertisementId || (!d.advertisementId && !msg.advertisementId))
+                        );
+                        if (dialog && !msg.isRead) {
+                            dialog.unreadCount++;
+                        }
+                    });
                 }
             } catch (e) {
                 console.error("Error parsing WS message:", e);
@@ -96,6 +110,7 @@ class MessageStore {
                 senderId,
                 recipientId,
                 content,
+                isRead: false,
                 createdAt: new Date().toISOString()
             });
             setTimeout(() => this.fetchDialogs(), 500);
@@ -147,6 +162,85 @@ class MessageStore {
             this.messages = [];
         } catch (e) {
             console.error('Failed to delete dialog', e);
+        }
+    }
+
+    async messageRead(messageId: string, userId?: string) {
+        try {
+            let targetUserId = userId;
+
+            if (!targetUserId) {
+                const message = this.messages.find(msg =>
+                    msg.id?.toString() === messageId || msg.id === Number(messageId)
+                );
+                targetUserId = message?.senderId;
+            }
+
+            if (!targetUserId) {
+                throw new Error('Не удалось определить userId для пометки сообщения');
+            }
+
+            const response = await $api.post(`/dialog/${targetUserId}/${messageId}`);
+
+            runInAction(() => {
+                const messageIndex = this.messages.findIndex(msg =>
+                    msg.id?.toString() === messageId || msg.id === Number(messageId)
+                );
+
+                if (messageIndex !== -1) {
+                    this.messages[messageIndex].isRead = true;
+                    console.log(`Сообщение "${this.messages[messageIndex].content}", id: ${messageId}, status: прочитано`);
+
+                    // Уменьшаем счетчик непрочитанных в диалоге
+                    const msg = this.messages[messageIndex];
+                    const dialog = this.dialogs.find(d => d.id === msg.senderId);
+                    if (dialog && dialog.unreadCount > 0) {
+                        dialog.unreadCount--;
+                    }
+                }
+            });
+
+            return response;
+        } catch (e) {
+            console.error('Failed to read the message', e);
+            throw e;
+        }
+    }
+
+    async markMessagesAsRead(messageIds: string[], userId: string) {
+        try {
+            // Пометка каждого сообщения по отдельности
+            const results = await Promise.all(
+                messageIds.map(messageId => this.messageRead(messageId, userId))
+            );
+
+            return results;
+        } catch (e) {
+            console.error('Failed to mark messages as read', e);
+            throw e;
+        }
+    }
+
+    async markAllFromUserAsRead(userId: string) {
+        try {
+            const unreadMessages = this.messages.filter(msg =>
+                msg.senderId === userId && !msg.isRead && msg.id
+            );
+
+            if (unreadMessages.length === 0) {
+                console.log('Нет непрочитанных сообщений');
+                return { count: 0 };
+            }
+
+            console.log(`Помечаем ${unreadMessages.length} сообщений как прочитанные`);
+
+            const messageIds = unreadMessages.map(msg => msg.id!.toString());
+            const results = await this.markMessagesAsRead(messageIds, userId);
+
+            return { count: results.length };
+        } catch (e) {
+            console.error('Failed to mark all messages as read', e);
+            throw e;
         }
     }
 }

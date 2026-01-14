@@ -19,6 +19,10 @@ class MessageService {
     async saveMessage(senderId, recipientId, content, advertisementId) {
         return await MessageModal.saveMessage(senderId, recipientId, content, advertisementId);
     }
+
+    async markRead(messageId, userId){
+        return await MessageModal.markReaded(messageId, userId);
+    }
 }
 
 module.exports = new MessageService()

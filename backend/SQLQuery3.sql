@@ -67,4 +67,7 @@ CREATE INDEX IX_messages_sender_recipient ON messages(senderId, recipientId);
 CREATE INDEX IX_messages_recipient_sender ON messages(recipientId, senderId);
 
 ALTER TABLE messages
-ADD advertisementId NVARCHAR(255) NULL;
+ADD advertisementId NVARCHAR(255) NULL; 
+
+ALTER TABLE messages 
+ADD is_read BIT NOT NULL DEFAULT 0;
