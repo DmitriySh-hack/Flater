@@ -93,7 +93,8 @@ const Favorite = observer(() => {
         }
         try{
             await store.toggleBooking(advertisementId)
-            alert("Объявление добавлено в корзину избранного")
+            console.log(store.isAdvertisementBooking(advertisementId))
+            alert("Объявление добавлено в корзину")
         }catch(error){
             console.error(error)
         }
@@ -172,7 +173,9 @@ const Favorite = observer(() => {
                             
 
                             <div>
-                                <button className="booking-btn" onClick={() => handleBookingToggle(ad.id)}>Забронировать</button>
+                                <button className="booking-btn" 
+                                style={{backgroundColor: (!store.isAdvertisementBooking(ad.id)) ? '' : 'grey'}}
+                                onClick={() => handleBookingToggle(ad.id)}>{(!store.isAdvertisementBooking(ad.id)) ? 'Забронировать' : 'Удалить бронь'}</button>
                             </div>
                         </div>
                             

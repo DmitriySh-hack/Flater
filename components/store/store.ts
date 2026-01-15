@@ -1,12 +1,13 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import type { IUSER } from "../models/IUser";
 import AuthService from "../service/AuthService";
 import $api from "../http";
 import type { AuthResponse } from "../models/response/AuthResponse";
 import UserService from "../service/UserService";
 import type { IADVERTISMENT } from "../models/IAdventisment";
+import { useState } from "react";
 
-interface AdvertismentState{
+interface AdvertismentState {
     advertisments: IADVERTISMENT[],//Массив объявлений
     error: string | null;
 }
@@ -20,6 +21,9 @@ interface AxiosError {
 }
 
 export default class Store {
+
+    bookingMap = new Map<string, IADVERTISMENT>();
+
     user = {} as IUSER
     isAuth = false;
     isLoading = true;
@@ -36,7 +40,7 @@ export default class Store {
     publicAdvertisements: IADVERTISMENT[] = [];
     publicAdsLoading = false;
     publicAdsError: string | null = null;
-    
+
     favorites: IADVERTISMENT[] = [];
     favoritesLoading = false;
     favoritesError: string | null = null;
@@ -47,7 +51,7 @@ export default class Store {
     bookingError: string | null = null;
     bookingStatus: Record<string, boolean> = {}
 
-    setSelectedAd(ad: IADVERTISMENT){
+    setSelectedAd(ad: IADVERTISMENT) {
         this.selectedAdvertisement = ad;
     }
 
@@ -68,11 +72,11 @@ export default class Store {
         this.favorites = favorites;
     }
 
-    setFavoritesLoading(loading: boolean){
+    setFavoritesLoading(loading: boolean) {
         this.favoritesLoading = loading
     }
 
-    setFavoritesError(error: string | null){
+    setFavoritesError(error: string | null) {
         this.favoritesError = error
     }
 
@@ -88,16 +92,19 @@ export default class Store {
         this.favoriteStatuses = statuses;
     }
 
-    //Бронирование
-    setBooking(booking: IADVERTISMENT[]){
+    setBooking(booking: IADVERTISMENT[]) {
         this.booking = booking;
+        this.bookingMap.clear();
+        booking.forEach(ad => {
+            if (ad.id) this.bookingMap.set(ad.id, ad);
+        });
     }
 
-    setBookingLoading(loading: boolean){
+    setBookingLoading(loading: boolean) {
         this.bookingLoading = loading
     }
 
-    setBookingError(error:string | null){
+    setBookingError(error: string | null) {
         this.bookingError = error
     }
 
@@ -105,7 +112,7 @@ export default class Store {
         this.bookingStatus = statuses;
     }
 
-    updateBookingStatus(advertisementId: string, isBooking: boolean){
+    updateBookingStatus(advertisementId: string, isBooking: boolean) {
         this.bookingStatus[advertisementId] = isBooking
     }
 
@@ -114,33 +121,33 @@ export default class Store {
     }
 
 
-        
+
     constructor() {
         makeAutoObservable(this);
         this.initializeAuth();
     }
 
-    setAuth(bool: boolean){
+    setAuth(bool: boolean) {
         this.isAuth = bool
     }
 
-    setUser(user: IUSER){
+    setUser(user: IUSER) {
         this.user = user;
     }
 
-    setAdvertisment(ads: IADVERTISMENT[]){
+    setAdvertisment(ads: IADVERTISMENT[]) {
         this.advertisment.advertisments = ads;
     }
 
-    addAdvertisment(ad: IADVERTISMENT){
+    addAdvertisment(ad: IADVERTISMENT) {
         this.advertisment.advertisments.unshift(ad);
     }
 
-    removeAdvertisment(adId: string){
+    removeAdvertisment(adId: string) {
         this.advertisment.advertisments = this.advertisment.advertisments.filter(ad => ad.id !== adId)
     }
 
-    setAdvertisementError(e: string | null){
+    setAdvertisementError(e: string | null) {
         this.advertisment.error = e;
     }
 
@@ -148,27 +155,27 @@ export default class Store {
         this.cities = cities;
     }
 
-    get userAdvertisment(){
+    get userAdvertisment() {
         return this.advertisment.advertisments;
     }
 
-    get advertismentError(){
+    get advertismentError() {
         return this.advertisment.error;
     }
 
     async initializeAuth() {
-        try{
-             const token = localStorage.getItem('token');
+        try {
+            const token = localStorage.getItem('token');
             if (token) {
                 await this.checkAuth();
             }
-        }catch(error){
+        } catch (error) {
             console.log('Ошибка инициализации аутентификации', error);
         }
     }
 
-    async login(email: string, password: string){
-        try{
+    async login(email: string, password: string) {
+        try {
             const response = await AuthService.login(email, password);
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
@@ -182,8 +189,8 @@ export default class Store {
         }
     }
 
-    async registration(email: string, password: string, firstName: string, lastName: string){
-        try{
+    async registration(email: string, password: string, firstName: string, lastName: string) {
+        try {
             const response = await AuthService.registration(email, password, firstName, lastName);
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
@@ -193,8 +200,8 @@ export default class Store {
         }
     }
 
-    async logout(){
-        try{
+    async logout() {
+        try {
             await AuthService.logout();
             localStorage.removeItem('token')
             this.setAuth(false);
@@ -203,48 +210,50 @@ export default class Store {
             this.setAdvertisment([]);
             this.setFavorites([]);
             this.setFavoriteStatuses({});
+            this.bookingMap.clear();
+            this.setBooking([]);
 
         } catch (e) {
             console.log('Ошибка выхода:', e);
         }
     }
 
-    async checkAuth(){
+    async checkAuth() {
         console.log('🔄 [Store] checkAuth called');
         console.log('📝 LocalStorage token:', localStorage.getItem('token'));
-        
-        try{
+
+        try {
             console.log('📤 Sending request to /refresh...');
             const response = await $api.get<AuthResponse>(`/refresh`);
-            
+
             console.log('✅ Response received, status:', response.status);
             console.log('👤 User data:', response.data.user);
             console.log('🔑 New access token:', response.data.accessToken.substring(0, 20) + '...');
-            
+
             localStorage.setItem('token', response.data.accessToken)
             this.setAuth(true);
             this.setUser(response.data.user);
 
             console.log('📥 Loading user advertisements...');
             await this.getUserAdvertisments();
-            
+
             console.log('📥 Loading favorites...');
             await this.getFavorites();
-            
+
             console.log('✅ Auth check completed successfully');
-            
+
         } catch (e: unknown) {
             console.error('❌ Error in checkAuth:');
-            
+
             if (e && typeof e === 'object' && 'response' in e) {
-                const axiosError = e as { 
-                    response?: { 
-                        status?: number; 
-                        data?: { message?: string } 
-                    }; 
-                    message?: string 
+                const axiosError = e as {
+                    response?: {
+                        status?: number;
+                        data?: { message?: string }
+                    };
+                    message?: string
                 };
-                
+
                 console.error('Status:', axiosError.response?.status);
                 console.error('Message:', axiosError.response?.data?.message || axiosError.message || 'Unknown error');
             } else if (e instanceof Error) {
@@ -252,67 +261,67 @@ export default class Store {
             } else {
                 console.error('Unknown error:', e);
             }
-            
+
             localStorage.removeItem('token');
             this.setAuth(false);
             this.setUser({} as IUSER);
             this.setFavorites([]);
             this.setAdvertisment([]);
-            
+
             throw e;
         }
     }
 
-    async updateProfile(update: Partial<Pick<IUSER, 'firstName' | 'lastName' | 'email'>>){
-        try{
+    async updateProfile(update: Partial<Pick<IUSER, 'firstName' | 'lastName' | 'email'>>) {
+        try {
             const response = await UserService.updateProfile(update)
             this.setUser(response.data.user)
             return response.data.user
-        }catch(e){
+        } catch (e) {
             console.log('Ошибка обновления профиля:', e);
             throw e;
         }
     }
 
-    async changePassword(oldPassword: string, newPassword: string){
-        try{
-            const response = await UserService.changePassword({oldPassword, newPassword})
+    async changePassword(oldPassword: string, newPassword: string) {
+        try {
+            const response = await UserService.changePassword({ oldPassword, newPassword })
             return response.data.success
-        }catch(e){
+        } catch (e) {
             console.log('Ошибка смены пароля:', e);
             throw e;
         }
     }
 
-    async uploadAvatar(file: File){
-        try{
+    async uploadAvatar(file: File) {
+        try {
             const formData = new FormData();
             formData.append('avatar', file)
             const response = await UserService.uploadAvatar(formData);
             this.setUser(response.data.user)
             return response.data.user
-        }catch(e){
+        } catch (e) {
             console.log('Ошибка загрузки аватара:', e);
             throw e;
         }
     }
 
-    async createAdvertisment(adData: Omit<IADVERTISMENT, 'id' | 'userId'>){
-        try{
+    async createAdvertisment(adData: Omit<IADVERTISMENT, 'id' | 'userId'>) {
+        try {
             const response = await $api.post(`/advertisements`, adData);
             this.addAdvertisment(response.data)
             return response.data;
-        }catch(e: unknown){
+        } catch (e: unknown) {
             let errorMessage = 'Ошибка при загрузке объявлений';
             const axiosError = e as AxiosError;
-            
+
             if (axiosError.response?.data?.message) {
                 errorMessage = axiosError.response.data.message;
                 console.log(axiosError.response.data.message);
             } else {
                 console.log('Ошибка загрузки объявлений:', e);
             }
-            
+
             this.setAdvertisementError(errorMessage);
             throw e;
         }
@@ -328,55 +337,55 @@ export default class Store {
     ) {
         try {
             const formData = new FormData();
-            
+
             // Добавляем текстовые данные
             formData.append('title', title);
             formData.append('price', price?.toString() || '');
             formData.append('city', city);
             formData.append('street', street);
             formData.append('countOfRooms', countOfRooms.toString());
-            
+
             // Добавляем файлы (как для аватара)
             if (images && images.length > 0) {
                 images.forEach((file) => {
                     formData.append('images', file); // 'images' вместо 'avatar'
                 });
             }
-            
+
             // Используем ту же логику, что и для uploadAvatar
             const response = await $api.post(`/advertisements`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            
+
             this.addAdvertisment(response.data);
             return response.data;
-            
+
         } catch (e: unknown) {
             let errorMessage = 'Ошибка при создании объявления';
             const axiosError = e as AxiosError;
-            
+
             if (axiosError.response?.data?.message) {
                 errorMessage = axiosError.response.data.message;
                 console.log(axiosError.response.data.message);
             } else {
                 console.log('Ошибка создания объявления:', e);
             }
-            
+
             this.setAdvertisementError(errorMessage);
             throw e;
         }
     }
 
-    async getUserAdvertisments(){
+    async getUserAdvertisments() {
         if (!this.isAuth) return;
 
-        try{
+        try {
             const response = await $api.get(`/advertisements`);
             this.setAdvertisment(response.data)
             return response.data
-        }catch(e: unknown){
+        } catch (e: unknown) {
             let errorMessage = 'Ошибка получения количества объявлений'
             const axiosError = e as AxiosError;
 
@@ -386,19 +395,19 @@ export default class Store {
             } else {
                 console.log('Ошибка загрузки объявлений:', e);
             }
-            
+
             this.setAdvertisementError(errorMessage);
             throw e;
         }
     }
 
-    async updateAdvertisment(adId: string, updateData: Partial<IADVERTISMENT>){
-        try{
+    async updateAdvertisment(adId: string, updateData: Partial<IADVERTISMENT>) {
+        try {
             const response = await $api.put(`/advertisements/${adId}`, updateData);
-            const updateAds = this.advertisment.advertisments.map(ad => ad.id === adId ? {...ad, ...updateData} : ad);
+            const updateAds = this.advertisment.advertisments.map(ad => ad.id === adId ? { ...ad, ...updateData } : ad);
             this.setAdvertisment(updateAds)
             return response.data
-        }catch(e: unknown){
+        } catch (e: unknown) {
             let errorMessage = 'Ошибка получения количества объявлений'
             const axiosError = e as AxiosError;
 
@@ -408,49 +417,49 @@ export default class Store {
             } else {
                 console.log('Ошибка загрузки объявлений:', e);
             }
-            
+
             this.setAdvertisementError(errorMessage);
             throw e;
-            
+
         }
     }
 
-    async deleteAdvertisment(adId: string){
-        try{
+    async deleteAdvertisment(adId: string) {
+        try {
             await $api.delete(`/advertisements/${adId}`);
             this.removeAdvertisment(adId)
             return true;
-        }catch(e: unknown){
-             let errorMessage = 'Ошибка при загрузке объявлений';
-             const axiosError = e as AxiosError;
-            
+        } catch (e: unknown) {
+            let errorMessage = 'Ошибка при загрузке объявлений';
+            const axiosError = e as AxiosError;
+
             if (axiosError.response?.data?.message) {
                 errorMessage = axiosError.response.data.message;
                 console.log(axiosError.response.data.message);
             } else {
                 console.log('Ошибка загрузки объявлений:', e);
             }
-                        
+
             this.setAdvertisementError(errorMessage);
             throw e;
         }
     }
 
-    async getAllAdvertisments(){
+    async getAllAdvertisments() {
         this.setPublicAdsLoading(true);
         this.setPublicAdsError(null);
 
-        try{
+        try {
             const response = await fetch('http://localhost:5000/api/advertisements/all');
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const data = await response.json();
             this.setPublicAdvertisements(data);
             return data;
-        }catch(e: unknown){
+        } catch (e: unknown) {
             let errorMessage = 'Ошибка загрузки объявлений';
 
             if (e instanceof Error) {
@@ -460,27 +469,27 @@ export default class Store {
             this.setPublicAdsError(errorMessage);
             console.log('Ошибка загрузки публичных объявлений:', e);
             throw e;
-        }finally{
+        } finally {
             this.setPublicAdsLoading(false);
         }
     }
 
-    async addFavorite(advertisementId: string){
-        if(!this.isAuth){
+    async addFavorite(advertisementId: string) {
+        if (!this.isAuth) {
             throw new Error('Необходимо авторизироваться')
         }
 
-        try{
+        try {
             console.log('Отправка запроса на добавление в избранное:', advertisementId);
             const response = await $api.post(`/favorites`, { advertisementId });
             console.log('Ответ сервера:', response.data);
             this.updateFavoriteStatus(advertisementId, true)
             const ad = this.publicAdvertisements.find(a => a.id == advertisementId)
-            if(ad && !this.favorites.some(f => f.id === advertisementId)){
+            if (ad && !this.favorites.some(f => f.id === advertisementId)) {
                 this.favorites.push(ad)
             }
             return response.data
-        }catch(e: unknown){
+        } catch (e: unknown) {
             const axiosError = e as AxiosError;
             console.error('Полная ошибка Axios:', axiosError);
             console.error('Response data:', axiosError.response?.data);
@@ -490,17 +499,17 @@ export default class Store {
         }
     }
 
-    async removeFavorite(advertisementId: string){
-        if(!this.isAuth){
+    async removeFavorite(advertisementId: string) {
+        if (!this.isAuth) {
             throw new Error('Необходимо авторизироваться')
         }
 
-        try{
+        try {
             const response = await $api.delete(`/favorites/${advertisementId}`)
             this.updateFavoriteStatus(advertisementId, false)
             this.favorites = this.favorites.filter(f => f.id !== advertisementId)
             return response.data
-        }catch(e: unknown){
+        } catch (e: unknown) {
             const axiosError = e as AxiosError;
             const errorMessage = axiosError.response?.data?.message || 'Ошибка при удалении из избранное';
             console.error('Ошибка удаления из избранного:', e);
@@ -510,7 +519,7 @@ export default class Store {
 
     async toggleFavorite(advertisementId: string) {
         const isFavorite = this.isAdvertisementFavorite(advertisementId);
-        
+
         if (isFavorite) {
             return await this.removeFavorite(advertisementId);
         } else {
@@ -548,21 +557,21 @@ export default class Store {
 
         try {
             const statuses: Record<string, boolean> = {};
-            
+
             const favorites = await this.getFavorites();
 
-            const validFavorites = favorites.filter((f: IADVERTISMENT | null) => 
+            const validFavorites = favorites.filter((f: IADVERTISMENT | null) =>
                 f && f.id && typeof f.id === 'string'
             );
-            
+
             const favoriteIds = new Set(validFavorites.map((f: IADVERTISMENT) => f.id));
-            
+
             this.publicAdvertisements.forEach(ad => {
                 if (ad && ad.id) {
                     statuses[ad.id] = favoriteIds.has(ad.id);
                 }
             });
-            
+
             this.setFavoriteStatuses(statuses);
         } catch (error) {
             console.error('Ошибка загрузки статусов избранного:', error);
@@ -583,7 +592,7 @@ export default class Store {
         }
     }
 
-    async getBookingAdvertisement(){
+    async getBookingAdvertisement() {
         if (!this.isAuth) {
             return [];
         }
@@ -591,12 +600,12 @@ export default class Store {
         this.setBookingLoading(true)
         this.setBookingError(null)
 
-        try{
+        try {
             const response = await $api.get('/booking');
             this.setBooking(response.data);
             return response.data;
 
-        }catch(error: unknown){
+        } catch (error: unknown) {
             const axiosError = error as AxiosError;
             const errorMessage = axiosError.response?.data?.message || 'Ошибка при загрузке бронирований';
             this.setBookingError(errorMessage);
@@ -607,46 +616,50 @@ export default class Store {
         }
     }
 
-    async loadBookingStatus(){
+    async loadBookingStatus() {
         try {
             const statuses: Record<string, boolean> = {};
-            
+
             const booking = await this.getBookingAdvertisement();
 
-            const validBooking = booking.filter((f: IADVERTISMENT | null) => 
+            const validBooking = booking.filter((f: IADVERTISMENT | null) =>
                 f && f.id && typeof f.id === 'string'
             );
-            
+
             const bookingIds = new Set(validBooking.map((f: IADVERTISMENT) => f.id));
-            
+
             this.publicAdvertisements.forEach(ad => {
                 if (ad && ad.id) {
                     statuses[ad.id] = bookingIds.has(ad.id);
                 }
             });
-            
+
             this.setBookingStatuses(statuses);
         } catch (error) {
             console.error('Ошибка загрузки статусов бронированных:', error);
         }
     }
 
-    async addBooking(advertisementId: string){
-        if(!this.isAuth){
+    async addBooking(advertisementId: string) {
+        if (!this.isAuth) {
             throw new Error('Необходимо авторизироваться')
         }
 
-        try{
+        try {
             console.log('Отправка запроса на бронирование:', advertisementId);
             const response = await $api.post(`/booking`, { advertisementId });
             console.log('Ответ сервера:', response.data);
-            this.updateBookingStatus(advertisementId, true)
-            const ad = this.publicAdvertisements.find(a => a.id == advertisementId)
-            if(ad && !this.booking.some(f => f.id === advertisementId)){
-                this.booking.push(ad)
-            }
-            return response.data
-        }catch(e: unknown){
+            runInAction(() => {
+                this.updateBookingStatus(advertisementId, true);
+                const ad = this.publicAdvertisements.find(a => a.id == advertisementId);
+                if (ad && !this.booking.some(f => f.id === advertisementId)) {
+                    this.booking.push(ad);
+                    this.bookingMap.set(ad.id, ad);
+                }
+            });
+
+            return response.data;
+        } catch (e: unknown) {
             const axiosError = e as AxiosError;
             console.error('Полная ошибка Axios:', axiosError);
             console.error('Response data:', axiosError.response?.data);
@@ -657,17 +670,20 @@ export default class Store {
     }
 
 
-    async removeBooking(advertisementId: string){
-        if(!this.isAuth){
+    async removeBooking(advertisementId: string) {
+        if (!this.isAuth) {
             throw new Error('Необходимо авторизироваться')
         }
 
-        try{
+        try {
             const response = await $api.delete(`/booking/${advertisementId}`)
-            this.updateBookingStatus(advertisementId, false)
-            this.booking = this.booking.filter(f => f.id !== advertisementId)
-            return response.data
-        }catch(e: unknown){
+            runInAction(() => {
+                this.updateBookingStatus(advertisementId, false);
+                this.booking = this.booking.filter(f => f.id !== advertisementId);
+                this.bookingMap.delete(advertisementId);
+            });
+            return response.data;
+        } catch (e: unknown) {
             const axiosError = e as AxiosError;
             const errorMessage = axiosError.response?.data?.message || 'Ошибка при удалении брони';
             console.error('Ошибка удаления брони:', e);
@@ -677,7 +693,7 @@ export default class Store {
 
     async toggleBooking(advertisementId: string) {
         const isFavorite = this.isAdvertisementBooking(advertisementId);
-        
+
         if (isFavorite) {
             return await this.removeBooking(advertisementId);
         } else {

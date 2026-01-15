@@ -6,37 +6,19 @@ import { useNavigate } from "react-router-dom";
 
 const Booking = observer(() => {
     const navigate = useNavigate()
-    const {store} = useContext(Context)
+    const { store } = useContext(Context)
     const [isLoading, setIsLoading] = useState(false)
 
     const uniqueBooking = useMemo(() => {
-        if (!store.booking || !Array.isArray(store.booking)) {
-            return [];
-        }
-        
-        const bookingMap = new Map();
-        
-        store.booking.forEach(book => {
-            if (book && book.id) {
-                if (!bookingMap.has(book.id)) {
-                    bookingMap.set(book.id, book);
-                } else {
-                    console.log('Found duplicate:', book.id);
-                }
-            }
-        });
-        
-
-        console.log(`Уникальных объявлений: ${bookingMap.size} из ${store.booking.length}`);
-        return Array.from(bookingMap.values());
-    }, [store.booking]);
+        return Array.from(store.bookingMap.values());
+    }, [store.booking, store.bookingMap]);
 
     const handleRemoveFromBooking = async (advertisementId: string) => {
-        if (!confirm('Удалить из избранного?')) return;
-        
+        if (!confirm('Удалить из бронируемого?')) return;
+
         try {
             await store.removeBooking(advertisementId);
-            alert('Удалено из избранного');
+            alert('Удалено из бронируемого');
         } catch (e) {
             console.error('Ошибка удаления:', e);
         }
@@ -46,15 +28,15 @@ const Booking = observer(() => {
         const loadBookingAd = async () => {
             setIsLoading(true);
 
-            try{
+            try {
                 await store.checkAuth();
 
-                if(store.isAuth){
+                if (store.isAuth) {
                     await store.getBookingAdvertisement()
                 }
-            }catch(e){
+            } catch (e) {
                 console.log(e)
-            }finally{
+            } finally {
                 setIsLoading(false)
             }
         }
@@ -75,7 +57,7 @@ const Booking = observer(() => {
         return (
             <div className="favorite-container">
                 <div className="auth-required">
-                    <h2 style={{fontSize: '32px'}}>Требуется авторизация</h2>
+                    <h2 style={{ fontSize: '32px' }}>Требуется авторизация</h2>
                     <p className='string-of-info'>Для бронирования необходимо войти в систему</p>
                     <button onClick={() => navigate('/login')} className="login-link">Войти</button>
                 </div>
@@ -95,12 +77,12 @@ const Booking = observer(() => {
             <div className="workPlace-container">
                 <div className="selectedAd-container">
                     {uniqueBooking.map((ad) => (
-                        <div key={`${ad.id}-${Math.random()}`} className="booking-card">
+                        <div key={ad.id} className="booking-card">
                             <div className="booking-card-main">
                                 <div className="booking-card-image">
-                                    <img 
-                                        src={ad.images && ad.images.length > 0 
-                                            ? getImageUrl(ad.images[0]) 
+                                    <img
+                                        src={ad.images && ad.images.length > 0
+                                            ? getImageUrl(ad.images[0])
                                             : 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/NOPHOTO.svg/1024px-NOPHOTO.svg.png'}
                                         alt={ad.title}
                                         onError={(e) => {
@@ -109,27 +91,27 @@ const Booking = observer(() => {
                                         className="booking-card-imgStyle"
                                     />
                                 </div>
-                                
+
                                 <div className="booking-card-content">
                                     <h3 className="booking-card-title">{ad.title}</h3>
-                                    
+
                                     <div className="booking-card-price">
-                                        {ad.price.toLocaleString('ru-RU')} ₽/день
+                                        {(ad.price ?? 0).toLocaleString('ru-RU')} ₽/день
                                     </div>
-                                    
+
                                     <div className="booking-card-details">
                                         <div className="detail-item">
                                             <span className="detail-label">Город:</span>
                                             <span className="detail-value">{ad.city}</span>
                                         </div>
-                                        
+
                                         {ad.street && (
                                             <div className="detail-item">
                                                 <span className="detail-label">Адрес:</span>
                                                 <span className="detail-value">{ad.street}</span>
                                             </div>
                                         )}
-                                        
+
                                         {ad.countOfRooms && (
                                             <div className="detail-item">
                                                 <span className="detail-label">Комнат:</span>
@@ -146,8 +128,8 @@ const Booking = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            
-                            <button 
+
+                            <button
                                 className="remove-booking-btn"
                                 onClick={() => handleRemoveFromBooking(ad.id)}
                                 title="Удалить из избранного"
@@ -159,18 +141,18 @@ const Booking = observer(() => {
                 </div>
                 <div className="costAd-container">
                     <div className="costAd-set">
-                        <h2 style={{marginBottom:'5px'}}>К оплате:</h2>
+                        <h2 style={{ marginBottom: '5px' }}>К оплате:</h2>
 
                         {uniqueBooking.map((ad) => (
-                            <div className="ad-info">
-                                <p>{ad.title}: {ad.price}₽/день</p>
+                            <div key={ad.id} className="ad-info">
+                                <p>{ad.title}: {ad.price ?? 0}₽/день</p>
                             </div>
                         ))}
                     </div>
                     <div className="costAd-price">
                         <div>
                             <p className="res-word">Итог:</p>
-                            <p style={{fontWeight: 'bold', fontSize: '24px'}}>
+                            <p style={{ fontWeight: 'bold', fontSize: '24px' }}>
                                 {uniqueBooking.reduce((sum, ad) => {
                                     const price = ad.price || 0;
                                     return sum + price;
@@ -180,7 +162,7 @@ const Booking = observer(() => {
                         <div className="booking-btn-container">
                             <button className="booking-btn">Бронировать</button>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>

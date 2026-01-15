@@ -242,7 +242,9 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                             </div>
                             <div style={{margin: '5px', display:'flex', justifyContent: 'right', alignItems: 'end'}}>
                                 <button className = "connecting-btn" onClick={() => handleConnectWithSeller(ad)}>Связаться с продавцом</button>
-                                <button className = "booking-btn" onClick={() => handleBookingToggle(ad.id)} >Забронировать</button>
+                                <button className = "booking-btn"
+                                style={{backgroundColor: (!store.isAdvertisementBooking(ad.id)) ? '' : 'grey'}}
+                                onClick={() => handleBookingToggle(ad.id)} >{(!store.isAdvertisementBooking(ad.id)) ? 'Забронировать' : 'Удалить бронь'}</button>
                             </div>
                         </div>
                     ))
