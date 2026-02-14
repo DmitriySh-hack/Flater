@@ -71,3 +71,12 @@ ADD advertisementId NVARCHAR(255) NULL;
 
 ALTER TABLE messages 
 ADD is_read BIT NOT NULL DEFAULT 0;
+
+CREATE TABLE booking_dates (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    advertisement_id NVARCHAR(36) NOT NULL,
+    user_id NVARCHAR(36) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL, 
+    created_at DATETIME DEFAULT GETDATE(),
+);

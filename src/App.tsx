@@ -13,14 +13,14 @@ import { FilterProvider } from '../components/Home/FilterContext/FilterContext'
 import Booking from '../components/Booking/Booking'
 import Messages from '../components/Message/Messages'
 import { Context } from '../src/main';
+import { observer } from 'mobx-react-lite';
 
-function App() {
-
+const App = observer(() => {
   const location = useLocation()
 
-  const isMessagePage = location.pathname.startsWith('/message');
+  const { store } = useContext(Context)
 
-  const {store} = useContext(Context)
+  const locationMessage = !location.pathname.startsWith('/message') || !store.isAuth
 
   useEffect(() => {
     function scrollSetting() {
@@ -54,6 +54,12 @@ function App() {
     };
   }, [location]);
 
+  if (store.isLoading) {
+    return (<div>Загрузка...</div>)
+  }
+
+  console.log("locationMessage = " + locationMessage, '\nstore.isAuth = ' + store.isAuth, typeof (store.isAuth))
+
   return (
     <div className="app-container">
       <HeaderSide />
@@ -74,9 +80,9 @@ function App() {
           <Route path='/message/:id' element={<Messages />} />
         </Routes>
       </main>
-      {(!isMessagePage || !store.isAuth) && <Footer />}
+      {(locationMessage && <Footer />)}
     </div>
   )
-}
+})
 
 export default App

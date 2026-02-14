@@ -1,7 +1,8 @@
 import { Context } from '../../../src/main';
 import './Middle_side.css'
 import { useEffect, useState, useContext, useMemo } from 'react'
-import {ModalInfo} from './ModalInfo'
+import { ModalInfo } from './ModalInfo'
+import { ModalCalendar } from '../../Calendar/ModalCalendar';
 import type { IADVERTISMENT } from '../../models/IAdventisment';
 import { observer } from 'mobx-react-lite';
 import { useFilterContext } from '../FilterContext/useFilterContext';
@@ -11,17 +12,20 @@ interface MiddleSideProps {
     searchQuery?: string;
 }
 
-const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
-    const {store} = useContext(Context)
+const Middle_side = observer(({ searchQuery = '' }: MiddleSideProps) => {
+    const { store } = useContext(Context)
     const [isLoading, setIsLoading] = useState(false)
 
     const navigate = useNavigate()
 
-    const {filters} = useFilterContext()
+    const { filters } = useFilterContext()
 
-    const [connectWithSeller, setConnectWithSeller] = useState(false)
-
+    const [connectWithSeller, setConnectWithSeller] = useState(false);
     const [selectedAdvertisement, setSelectedAdvertisement] = useState<IADVERTISMENT | null>(null);
+
+    // Состояния для календаря
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const [calendarAdId, setCalendarAdId] = useState<string | null>(null);
 
     const filterAdvertisements = useMemo(() => {
         let filteredAds = store.publicAdvertisements;
@@ -39,28 +43,28 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
         // 2. Применяем фильтры из контекста
         // Фильтр по цене "от"
         if (filters.priceFrom !== undefined && filters.priceFrom !== null) {
-            filteredAds = filteredAds.filter(ad => 
+            filteredAds = filteredAds.filter(ad =>
                 ad.price !== null && ad.price >= filters.priceFrom!
             );
         }
 
         // Фильтр по цене "до"
         if (filters.priceTo !== undefined && filters.priceTo !== null) {
-            filteredAds = filteredAds.filter(ad => 
+            filteredAds = filteredAds.filter(ad =>
                 ad.price !== null && ad.price <= filters.priceTo!
             );
         }
 
         // Фильтр по городу
         if (filters.city && filters.city.trim() !== '') {
-            filteredAds = filteredAds.filter(ad => 
+            filteredAds = filteredAds.filter(ad =>
                 ad.city?.toLowerCase() === filters.city!.toLowerCase()
             );
         }
 
         // Фильтр по количеству комнат
         if (filters.rooms !== undefined && filters.rooms !== null) {
-            filteredAds = filteredAds.filter(ad => 
+            filteredAds = filteredAds.filter(ad =>
                 ad.countOfRooms === filters.rooms
             );
         }
@@ -91,19 +95,19 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
     }, [store.isAuth, store.publicAdvertisements.length]);
 
     useEffect(() => {
-        if(store.isAuth && store.publicAdvertisements.length > 0) {
+        if (store.isAuth && store.publicAdvertisements.length > 0) {
             store.loadBookingStatus()
         }
     }, [store.isAuth, store.publicAdvertisements.length])
 
     useEffect(() => {
         const loadAdvertisment = async () => {
-            try{
+            try {
                 setIsLoading(true)
                 await store.getAllAdvertisments()
-            }catch(e){
+            } catch (e) {
                 console.log(e)
-            }finally{
+            } finally {
                 setIsLoading(false)
             }
         }
@@ -111,7 +115,7 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
         loadAdvertisment()
     }, [store])
 
-    
+
 
     const handleFavoriteToggle = async (advertisementId: string) => {
         if (!store.isAuth) {
@@ -119,41 +123,52 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
         }
         try {
             await store.toggleFavorite(advertisementId);
-        } catch(error) {
+        } catch (error) {
             console.error('Ошибка при изменении избранного:', error);
         }
     };
 
     const handleBookingToggle = async (advertisementId: string) => {
-        if(!store.isAuth){
+        if (!store.isAuth) {
             navigate('/booking')
+            return
         }
-        try{
-            await store.toggleBooking(advertisementId)
-        }catch(error){
-            console.error(error)
+
+        const isBooked = store.isAdvertisementBooking(advertisementId)
+
+        if (isBooked) {
+            // Если уже забронировано (кнопка "Удалить бронь") — просто удаляем
+            try {
+                await store.toggleBooking(advertisementId)
+            } catch (error) {
+                console.error(error)
+            }
+        } else {
+            // Если еще не забронировано (кнопка "Забронировать") — открываем календарь
+            setCalendarAdId(advertisementId)
+            setIsCalendarOpen(true)
         }
     }
 
     const formPrice = (priceVal: number | null) => {
-        if(priceVal === null) return 'Цена не указана'
+        if (priceVal === null) return 'Цена не указана'
         return `${priceVal.toLocaleString('ru-RU')} ₽`
     }
-        
+
     const getImageUrl = (path: string) => {
         return `http://localhost:5000${path}`;
     };
 
     const renderActiveFilters = () => {
         const activeFilters = [];
-        
+
         if (filters.priceFrom) activeFilters.push(`Цена от: ${filters.priceFrom} руб`);
         if (filters.priceTo) activeFilters.push(`Цена до: ${filters.priceTo} руб`);
         if (filters.city) activeFilters.push(`Город: ${filters.city}`);
         if (filters.rooms) activeFilters.push(`Комнат: ${filters.rooms}`);
-        
+
         if (activeFilters.length === 0) return null;
-        
+
         return (
             <div className="active-filters" style={{
                 margin: '10px 0',
@@ -163,7 +178,7 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                 borderRadius: '5px'
             }}>
                 <strong>Примененные фильтры:</strong> {activeFilters.join(' | ')}
-                <span style={{marginLeft: '10px', color: '#666', fontSize: '0.9em'}}>
+                <span style={{ marginLeft: '10px', color: '#666', fontSize: '0.9em' }}>
                     ({filterAdvertisements.length} объявлений)
                 </span>
             </div>
@@ -200,8 +215,8 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                     filterAdvertisements.map(ad => (
                         <div key={ad.id} className="ad-card-public">
                             <div className="ad-image-container">
-                                <img 
-                                    src={ad.images && ad.images.length > 0 ? getImageUrl(ad.images[0]) : 'default-photo.jpg'} 
+                                <img
+                                    src={ad.images && ad.images.length > 0 ? getImageUrl(ad.images[0]) : 'default-photo.jpg'}
                                     alt={ad.title}
                                     className="ad-image"
                                     onError={(e) => {
@@ -209,15 +224,15 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                                     }}
                                 />
                                 <div className='info-container'>
-                                    <div style={{display:'flex', justifyContent:'space-between'}}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <h3 className="ad-title">{ad.title}</h3>
-                                        <div style={{display: 'flex', alignItems: 'center'}}>
+                                        <div style={{ display: 'flex', alignItems: 'center' }}>
                                             <button
                                                 className={`heart-button ${store.isAdvertisementFavorite(ad.id) ? 'favorite' : ''}`}
                                                 onClick={() => handleFavoriteToggle(ad.id)}
                                                 title={store.isAdvertisementFavorite(ad.id) ? 'Удалить из избранного' : 'Добавить в избранное'}
-                                            />          
-                                        </div>    
+                                            />
+                                        </div>
                                     </div>
                                     <div className="ad-content">
                                         <div className="price-badge">
@@ -233,18 +248,30 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                                                 <span className="detail-label">Адрес: </span>
                                                 <span className="detail-value">{ad.city}, {ad.street}</span>
                                             </div>
-                                            <div className='articul' style={{color: 'rgb(128, 128, 128)'}}>
-                                                <span style={{color: 'rgba(120, 120, 120)'}}>Артикул:</span> {ad.id}
+                                            <div className='articul' style={{ color: 'rgb(128, 128, 128)' }}>
+                                                <span style={{ color: 'rgba(120, 120, 120)' }}>Артикул:</span> {ad.id}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div style={{margin: '5px', display:'flex', justifyContent: 'right', alignItems: 'end'}}>
-                                <button className = "connecting-btn" onClick={() => handleConnectWithSeller(ad)}>Связаться с продавцом</button>
-                                <button className = "booking-btn"
-                                style={{backgroundColor: (!store.isAdvertisementBooking(ad.id)) ? '' : 'grey'}}
-                                onClick={() => handleBookingToggle(ad.id)} >{(!store.isAdvertisementBooking(ad.id)) ? 'Забронировать' : 'Удалить бронь'}</button>
+                            <div style={{ margin: '5px', display: 'flex', justifyContent: 'right', alignItems: 'end' }}>
+                                <button className="connecting-btn" onClick={() => handleConnectWithSeller(ad)}>Связаться с продавцом</button>
+                                <button className="booking-btn"
+                                    style={{ backgroundColor: (!store.isAdvertisementBooking(ad.id)) ? '' : 'grey' }}
+                                    onClick={() => handleBookingToggle(ad.id)} >{(!store.isAdvertisementBooking(ad.id)) ? 'Забронировать' : 'Удалить бронь'}</button>
+                                {store.isAdvertisementBooking(ad.id) && (
+                                    <button
+                                        className="booking-btn"
+                                        style={{ marginLeft: '10px' }}
+                                        onClick={() => {
+                                            setCalendarAdId(ad.id);
+                                            setIsCalendarOpen(true);
+                                        }}
+                                    >
+                                        Выбрать ещё дату
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))
@@ -253,6 +280,12 @@ const Middle_side = observer(({ searchQuery = '' } : MiddleSideProps) =>{
                     isOpen={connectWithSeller}
                     isClose={() => setConnectWithSeller(false)}
                     advertisement={selectedAdvertisement}
+                />
+
+                <ModalCalendar
+                    isOpen={isCalendarOpen}
+                    isClose={() => setIsCalendarOpen(false)}
+                    adId={calendarAdId}
                 />
             </div>
         </div>

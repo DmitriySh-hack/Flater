@@ -1,17 +1,17 @@
 const Router = require('express').Router;
-const userController = require('../controllers/user-controller.cjs')
-const advertisementController = require('../advertisement/advertisment-controller.cjs')
-const router = new Router();
-const { body } = require('express-validator')
-const authMidddleware = require('../middleware/auth-middleware.cjs');
+const userController = require('../controllers/user-controller.cjs');
+const { body } = require('express-validator');
+const authMiddleware = require('../middleware/auth-middleware.cjs');
+const advertisementController = require('../advertisement/advertisment-controller.cjs');
+const FavoriteAdvertisementController = require('../favorite-advertisement/favorite-advertisement-controller.cjs');
+const BookingAdvertisementController = require('../booking-advertisement/booking-controller.cjs');
+const CalendarController = require('../calendar/calendar-controller.cjs');
+const MessageController = require('../messages/message-controller.cjs');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const FavoriteAdvertisementController = require('../favorite-advertisement/favorite-advertisement-controller.cjs')
-const BookingAdvertisementController = require('../booking-advertisement/booking-controller.cjs')
-const MessageController = require('../messages/message-controller.cjs')
 
-//Создание директории аватарки
+// Создание директорий для загрузок
 const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
@@ -22,7 +22,7 @@ if (!fs.existsSync(adUploadsDir)) {
     fs.mkdirSync(adUploadsDir, { recursive: true });
 }
 
-//Проверка, что файл подходит, как по размеру, так и по формату
+// Конфигурация multer для аватарок
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 },
@@ -35,6 +35,7 @@ const upload = multer({
     }
 });
 
+// Конфигурация multer для объявлений
 const adUpload = multer({
     storage: multer.diskStorage({
         destination: (req, file, cb) => {
@@ -55,42 +56,48 @@ const adUpload = multer({
     }
 });
 
-//Всевозможные особенные переходы между страницами
+const router = new Router();
+
+// Пользователи
 router.post('/registration', body('email').isEmail(), body('password').isLength({ min: 3, max: 16 }), userController.registration);
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.get('/activate/:link', userController.activate);
 router.get('/refresh', userController.refresh);
-router.put('/profile', authMidddleware, userController.updateProfile);
-router.put('/change-password', authMidddleware, userController.changePassword);
-router.post('/upload-avatar', authMidddleware, upload.single('avatar'), userController.uploadAvatar);
+router.put('/profile', authMiddleware, userController.updateProfile);
+router.put('/change-password', authMiddleware, userController.changePassword);
+router.post('/upload-avatar', authMiddleware, upload.single('avatar'), userController.uploadAvatar);
 
-//Добавление объявления
-router.post('/advertisements', authMidddleware, adUpload.array('images', 10), advertisementController.createAdvertisment);
-router.get('/advertisements', authMidddleware, advertisementController.getAdvertismentUser);
-router.put('/advertisements/:id', authMidddleware, advertisementController.getUpdateForAdvertisment);
-router.delete('/advertisements/:id', authMidddleware, advertisementController.deleteAdvertisement);
-
+// Объявления
+router.post('/advertisements', authMiddleware, adUpload.array('images', 10), advertisementController.createAdvertisment);
+router.get('/advertisements', authMiddleware, advertisementController.getAdvertismentUser);
+router.put('/advertisements/:id', authMiddleware, adUpload.array('images', 10), advertisementController.getUpdateForAdvertisment);
+router.delete('/advertisements/:id', authMiddleware, advertisementController.deleteAdvertisement);
 router.get('/advertisements/all', advertisementController.getAllAdvertisements);
 router.get('/advertisements/:id/with-user', advertisementController.getAdvertisementWithUser);
+router.get('/advertisements/all-cities', advertisementController.getAllCities);
 
-router.get('/advertisements/all-cities', advertisementController.getAllCities)
+// Избранное
+router.post('/favorites', authMiddleware, FavoriteAdvertisementController.addAdvertismentToFavorite);
+router.get('/favorites', authMiddleware, FavoriteAdvertisementController.getFavorite);
+router.delete('/favorites/:advertisementId', authMiddleware, FavoriteAdvertisementController.deleteFavoriteAdvertisement);
 
-//Избранное
-router.post('/favorites', authMidddleware, FavoriteAdvertisementController.addAdvertismentToFavorite);
-router.get('/favorites', authMidddleware, FavoriteAdvertisementController.getFavorite);
-router.delete('/favorites/:advertisementId', authMidddleware, FavoriteAdvertisementController.deleteFavoriteAdvertisement)
+// Бронирование (системный список)
+router.post('/booking', authMiddleware, BookingAdvertisementController.bookingAdvertisement);
+router.delete('/booking/:advertisementId', authMiddleware, BookingAdvertisementController.deleteBookingAdvertisemnt);
+router.get('/booking', authMiddleware, BookingAdvertisementController.getBooking);
 
-router.post('/booking', authMidddleware, BookingAdvertisementController.bookingAdvertisement);
-router.get('/booking', authMidddleware, BookingAdvertisementController.getBooking);
-router.delete('/booking/:advertisementId', authMidddleware, BookingAdvertisementController.deleteBookingAdvertisemnt)
+// Сообщения
+router.get('/messages/:userId', authMiddleware, MessageController.getHistory);
+router.get('/dialogs', authMiddleware, MessageController.getDialogs);
+router.put('/messages/read/:messageId', authMiddleware, MessageController.markRead);
 
+// Календарь бронирования
+router.get('/calendar/:adId', CalendarController.getBooking);
+router.post('/calendar/reserve', authMiddleware, CalendarController.createdBooking);
+router.delete('/calendar/:adId', authMiddleware, CalendarController.deleteBooking);
 
+router.get('/booking/entries', authMiddleware, CalendarController.getBookingEntries);
+router.delete('/calendar/booking/:id', authMiddleware, CalendarController.deleteBookingEntries);
 
-router.get('/dialogs', authMidddleware, MessageController.getDialogs);
-router.delete('/dialogs/:userId', authMidddleware, MessageController.deleteDialog);
-router.get('/message/:userId', authMidddleware, MessageController.getHistory);
-router.post('/dialog/:userId/:messageId', authMidddleware, MessageController.markRead);
-
-
-module.exports = router
+module.exports = router;

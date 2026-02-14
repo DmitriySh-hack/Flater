@@ -1,0 +1,128 @@
+.calendar-container {
+    width: 320px;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.month-name {
+    font-weight: 600;
+    text-transform: capitalize;
+    color: #333;
+}
+
+.nav-btn {
+    background: #f0f0f0;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-btn:hover {
+    background: #e0e0e0;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    padding-bottom: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calendar-footer {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.selection-info {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+    min-height: 20px;
+    text-align: center;
+}
+
+.reserve-button {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+}
+
+.reserve-button:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+.reserve-button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.reserve-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Calendar Day Styles (re-imported or refined) */
+.calendar-day {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.calendar-day.booked {
+    background-color: #f8f8f8;
+    color: #ddd;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+.calendar-day.disabled {
+    color: #eee;
+    cursor: not-allowed;
+}
+
+.calendar-day.selected {
+    background-color: #007bff;
+    color: white !important;
+}
+
+.calendar-day.in-range {
+    background-color: #e7f1ff;
+    border-radius: 0;
+}

@@ -5,7 +5,7 @@ import $api from "../http";
 import type { AuthResponse } from "../models/response/AuthResponse";
 import UserService from "../service/UserService";
 import type { IADVERTISMENT } from "../models/IAdventisment";
-import { useState } from "react";
+import type { IBookingEntries } from '../models/IBookingEntries';
 
 interface AdvertismentState {
     advertisments: IADVERTISMENT[],//Массив объявлений
@@ -22,7 +22,7 @@ interface AxiosError {
 
 export default class Store {
 
-    bookingMap = new Map<string, IADVERTISMENT>();
+    bookingMap = new Map<number, IBookingEntries>();
 
     user = {} as IUSER
     isAuth = false;
@@ -46,7 +46,7 @@ export default class Store {
     favoritesError: string | null = null;
     favoriteStatuses: Record<string, boolean> = {};
 
-    booking: IADVERTISMENT[] = [];
+    booking: IBookingEntries[] = [];
     bookingLoading = false;
     bookingError: string | null = null;
     bookingStatus: Record<string, boolean> = {}
@@ -92,11 +92,11 @@ export default class Store {
         this.favoriteStatuses = statuses;
     }
 
-    setBooking(booking: IADVERTISMENT[]) {
+    setBooking(booking: IBookingEntries[]) {
         this.booking = booking;
         this.bookingMap.clear();
-        booking.forEach(ad => {
-            if (ad.id) this.bookingMap.set(ad.id, ad);
+        booking.forEach(entry => {
+            if (entry.id != null) this.bookingMap.set(entry.id, entry);
         });
     }
 
@@ -171,6 +171,10 @@ export default class Store {
             }
         } catch (error) {
             console.log('Ошибка инициализации аутентификации', error);
+        } finally {
+            runInAction(() => {
+                this.isLoading = false;
+            });
         }
     }
 
@@ -592,19 +596,19 @@ export default class Store {
         }
     }
 
+    /** Загружает список бронирований с датами (записи из booking_dates). Одна запись = один период. */
     async getBookingAdvertisement() {
         if (!this.isAuth) {
             return [];
         }
 
-        this.setBookingLoading(true)
-        this.setBookingError(null)
+        this.setBookingLoading(true);
+        this.setBookingError(null);
 
         try {
-            const response = await $api.get('/booking');
+            const response = await $api.get<IBookingEntries[]>('/booking/entries');
             this.setBooking(response.data);
             return response.data;
-
         } catch (error: unknown) {
             const axiosError = error as AxiosError;
             const errorMessage = axiosError.response?.data?.message || 'Ошибка при загрузке бронирований';
@@ -612,77 +616,92 @@ export default class Store {
             console.error('Ошибка загрузки бронирований:', error);
             throw error;
         } finally {
-            this.setBookingLoading(false)
+            this.setBookingLoading(false);
         }
     }
 
+    /** Статус «забронировано»: у пользователя есть хотя бы один период по этому объявлению. */
     async loadBookingStatus() {
         try {
-            const statuses: Record<string, boolean> = {};
-
-            const booking = await this.getBookingAdvertisement();
-
-            const validBooking = booking.filter((f: IADVERTISMENT | null) =>
-                f && f.id && typeof f.id === 'string'
+            const entries = await this.getBookingAdvertisement() as IBookingEntries[];
+            const validEntries = entries.filter(
+                (e): e is IBookingEntries => e && typeof e.advertisementId === 'string'
             );
+            const bookedAdIds = new Set(validEntries.map(e => e.advertisementId));
 
-            const bookingIds = new Set(validBooking.map((f: IADVERTISMENT) => f.id));
-
+            const statuses: Record<string, boolean> = {};
             this.publicAdvertisements.forEach(ad => {
-                if (ad && ad.id) {
-                    statuses[ad.id] = bookingIds.has(ad.id);
-                }
+                if (ad?.id) statuses[ad.id] = bookedAdIds.has(ad.id);
             });
-
             this.setBookingStatuses(statuses);
         } catch (error) {
             console.error('Ошибка загрузки статусов бронированных:', error);
         }
     }
 
+    /** Добавляет связь в booking_advertisement; список периодов обновляется перезапросом с сервера. */
     async addBooking(advertisementId: string) {
         if (!this.isAuth) {
-            throw new Error('Необходимо авторизироваться')
+            throw new Error('Необходимо авторизироваться');
         }
 
         try {
-            console.log('Отправка запроса на бронирование:', advertisementId);
             const response = await $api.post(`/booking`, { advertisementId });
-            console.log('Ответ сервера:', response.data);
-            runInAction(() => {
-                this.updateBookingStatus(advertisementId, true);
-                const ad = this.publicAdvertisements.find(a => a.id == advertisementId);
-                if (ad && !this.booking.some(f => f.id === advertisementId)) {
-                    this.booking.push(ad);
-                    this.bookingMap.set(ad.id, ad);
-                }
-            });
-
+            this.updateBookingStatus(advertisementId, true);
+            await this.getBookingAdvertisement();
             return response.data;
         } catch (e: unknown) {
             const axiosError = e as AxiosError;
-            console.error('Полная ошибка Axios:', axiosError);
-            console.error('Response data:', axiosError.response?.data);
-            const errorMessage = axiosError.response?.data?.message || 'Ошибка при бронирование';
-            console.error('Ошибка при бронирование:', e);
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при бронировании';
+            console.error('Ошибка при бронировании:', e);
             throw new Error(errorMessage);
         }
     }
 
 
+    /** Удаляет все периоды бронирования по этой квартире (кнопка «Удалить бронь» на карточке объявления). */
     async removeBooking(advertisementId: string) {
         if (!this.isAuth) {
-            throw new Error('Необходимо авторизироваться')
+            throw new Error('Необходимо авторизироваться');
         }
 
         try {
-            const response = await $api.delete(`/booking/${advertisementId}`)
+            await $api.delete(`/booking/${advertisementId}`);
+            await $api.delete(`/calendar/${advertisementId}`);
+
             runInAction(() => {
                 this.updateBookingStatus(advertisementId, false);
-                this.booking = this.booking.filter(f => f.id !== advertisementId);
-                this.bookingMap.delete(advertisementId);
+                this.booking = this.booking.filter(e => e.advertisementId !== advertisementId);
+                this.bookingMap.clear();
+                this.booking.forEach(entry => this.bookingMap.set(entry.id, entry));
             });
-            return response.data;
+            return { message: 'Успешно удалено' };
+        } catch (e: unknown) {
+            const axiosError = e as AxiosError;
+            const errorMessage = axiosError.response?.data?.message || 'Ошибка при удалении брони';
+            console.error('Ошибка удаления брони:', e);
+            throw new Error(errorMessage);
+        }
+    }
+
+    /** Удаляет один период бронирования по id записи в booking_dates (кнопка на карточке во вкладке «Бронирование»). */
+    async removeBookingEntry(bookingDateId: number) {
+        if (!this.isAuth) {
+            throw new Error('Необходимо авторизироваться');
+        }
+
+        try {
+            await $api.delete(`/calendar/booking/${bookingDateId}`);
+            runInAction(() => {
+                const entry = this.booking.find(e => e.id === bookingDateId);
+                this.booking = this.booking.filter(e => e.id !== bookingDateId);
+                this.bookingMap.delete(bookingDateId);
+                if (entry?.advertisementId) {
+                    const stillBooked = this.booking.some(e => e.advertisementId === entry.advertisementId);
+                    this.updateBookingStatus(entry.advertisementId, stillBooked);
+                }
+            });
+            return { message: 'Успешно удалено' };
         } catch (e: unknown) {
             const axiosError = e as AxiosError;
             const errorMessage = axiosError.response?.data?.message || 'Ошибка при удалении брони';

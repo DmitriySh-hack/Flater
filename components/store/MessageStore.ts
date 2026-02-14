@@ -122,8 +122,8 @@ class MessageStore {
     async fetchHistory(userId: string, advertisementId?: string) {
         try {
             const url = advertisementId
-                ? `/message/${userId}?adId=${advertisementId}`
-                : `/message/${userId}`;
+                ? `/messages/${userId}?adId=${advertisementId}`
+                : `/messages/${userId}`;
             const response = await $api.get(url);
             this.setMessage(response.data);
         } catch (e) {
