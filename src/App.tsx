@@ -14,15 +14,18 @@ import Booking from '../components/Booking/Booking'
 import Messages from '../components/Message/Messages'
 import { Context } from '../src/main';
 import { observer } from 'mobx-react-lite';
+import { CRMRoute } from './CRMRoute'
 
 const App = observer(() => {
   const location = useLocation()
 
   const { store } = useContext(Context)
 
+  const isCRMPath = location.pathname.startsWith('/crmsys')
   const locationMessage = !location.pathname.startsWith('/message') || !store.isAuth
 
   useEffect(() => {
+    if (isCRMPath) return // CRM не использует footer
     function scrollSetting() {
       const scroll = document.querySelector('.footer-container') as HTMLElement | null;
       if (scroll) {
@@ -40,25 +43,30 @@ const App = observer(() => {
       }
     };
 
-    // Добавляем слушатель изменения размера окна
     window.addEventListener('resize', checkScroll);
 
     return () => {
       window.removeEventListener('resize', checkScroll);
-      // Сбрасываем стили при размонтировании
       const scroll = document.querySelector('.footer-container') as HTMLElement | null;
       if (scroll) {
         scroll.style.position = '';
         scroll.style.bottom = '';
       }
     };
-  }, [location]);
+  }, [location, isCRMPath]);
 
   if (store.isLoading) {
     return (<div>Загрузка...</div>)
   }
 
   console.log("locationMessage = " + locationMessage, '\nstore.isAuth = ' + store.isAuth, typeof (store.isAuth))
+
+  // CRM — отдельная площадка без Header, Footer и стилей основного приложения
+  if (isCRMPath) {
+    return (
+      <CRMRoute />
+    )
+  }
 
   return (
     <div className="app-container">

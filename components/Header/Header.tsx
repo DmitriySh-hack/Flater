@@ -14,6 +14,10 @@ function HeaderSide() {
             </div>
             
             <div className='active-part' style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
+                <div style={{paddingRight: '30px', cursor: 'pointer'}}>
+                    <p onClick={() => navigate('/crmsys/main')}>Для сотрудников</p>
+                </div>
+
                 <div className='message-element' style={{paddingRight: '30px'}} onClick={() => navigate('/message')}>
                     <img className='messageLogo' src={messageLogo}/>
                 </div>   

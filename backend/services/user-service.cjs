@@ -21,7 +21,15 @@ class UserService{
         const hashPassword = await bcrypt.hash(password, 3);
         const activationLink = uuid.v4();
         const id = String(Date.now());
-        const user = await userModel.create({id, email, password: hashPassword, activationLink, firstName, lastName, isActivated: false}) 
+        const user = await userModel.create({
+            id, 
+            email, 
+            password: hashPassword, 
+            activationLink, 
+            firstName, 
+            lastName, 
+            isActivated: false
+        }) 
         try {
             await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
         } catch (e) {

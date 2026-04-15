@@ -10,6 +10,7 @@ const MessageController = require('../messages/message-controller.cjs');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const employeeControll = require('../employeeCRM/employee-controll.cjs');
 
 // Создание директорий для загрузок
 const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
@@ -99,5 +100,18 @@ router.delete('/calendar/:adId', authMiddleware, CalendarController.deleteBookin
 
 router.get('/booking/entries', authMiddleware, CalendarController.getBookingEntries);
 router.delete('/calendar/booking/:id', authMiddleware, CalendarController.deleteBookingEntries);
+
+//CRM-router
+router.post(
+    '/employee/registration',
+    body('nickname').trim().isLength({ min: 2, max: 255 }),
+    body('password').isLength({ min: 3, max: 64 }),
+    body('name').trim().isLength({ min: 1, max: 255 }),
+    body('position').optional({ values: 'falsy' }).trim().isLength({ min: 1, max: 255 }),
+    employeeControll.registrationEmployee
+);
+router.post('/employee/login', employeeControll.loginEmployee)
+router.post('/employee/logout', employeeControll.logout)
+router.get('/employee/refresh', employeeControll.refresh)
 
 module.exports = router;

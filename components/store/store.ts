@@ -6,6 +6,7 @@ import type { AuthResponse } from "../models/response/AuthResponse";
 import UserService from "../service/UserService";
 import type { IADVERTISMENT } from "../models/IAdventisment";
 import type { IBookingEntries } from '../models/IBookingEntries';
+import type { IEmployee } from "../models/IEmployee";
 
 interface AdvertismentState {
     advertisments: IADVERTISMENT[],//Массив объявлений
@@ -120,7 +121,17 @@ export default class Store {
         return this.bookingStatus[advertisementId] || false
     }
 
+    //CRM
+    employee = {} as IEmployee
+    isEmployee = false;
 
+    setEmployee(employee: IEmployee){
+        return this.employee = employee;
+    }
+
+    setEmployeeAuth(value: boolean){
+        this.isEmployee = value;
+    }
 
     constructor() {
         makeAutoObservable(this);
@@ -163,11 +174,28 @@ export default class Store {
         return this.advertisment.error;
     }
 
+    private getTokenRole(token: string): string | null {
+        try {
+            const base64Payload = token.split('.')[1];
+            if (!base64Payload) return null;
+            const payloadJson = atob(base64Payload);
+            const payload = JSON.parse(payloadJson) as { role?: string };
+            return payload.role ?? null;
+        } catch {
+            return null;
+        }
+    }
+
     async initializeAuth() {
         try {
             const token = localStorage.getItem('token');
             if (token) {
-                await this.checkAuth();
+                const tokenRole = this.getTokenRole(token);
+                if (tokenRole === 'employee') {
+                    await this.checkEmployeeAuth();
+                } else {
+                    await this.checkAuth();
+                }
             }
         } catch (error) {
             console.log('Ошибка инициализации аутентификации', error);
@@ -207,18 +235,19 @@ export default class Store {
     async logout() {
         try {
             await AuthService.logout();
-            localStorage.removeItem('token')
-            this.setAuth(false);
-            this.setUser({} as IUSER);
-
-            this.setAdvertisment([]);
-            this.setFavorites([]);
-            this.setFavoriteStatuses({});
-            this.bookingMap.clear();
-            this.setBooking([]);
-
         } catch (e) {
             console.log('Ошибка выхода:', e);
+        } finally {
+            runInAction(() => {
+                localStorage.removeItem('token');
+                this.setAuth(false);
+                this.setUser({} as IUSER);
+                this.setAdvertisment([]);
+                this.setFavorites([]);
+                this.setFavoriteStatuses({});
+                this.bookingMap.clear();
+                this.setBooking([]);
+            });
         }
     }
 
@@ -272,6 +301,20 @@ export default class Store {
             this.setFavorites([]);
             this.setAdvertisment([]);
 
+            throw e;
+        }
+    }
+
+    async checkEmployeeAuth() {
+        try {
+            const response = await $api.get('/employee/refresh');
+            localStorage.setItem('token', response.data.accessToken);
+            this.setEmployee(response.data.user);
+            this.setEmployeeAuth(true);
+        } catch (e) {
+            localStorage.removeItem('token');
+            this.setEmployee({ id: '', name: '', nickname: '', position: '' });
+            this.setEmployeeAuth(false);
             throw e;
         }
     }
@@ -719,4 +762,48 @@ export default class Store {
             return await this.addBooking(advertisementId);
         }
     }
+
+    //CRM
+    async loginEmployee(nickname: string, password: string){
+        runInAction(() => { this.isLoading = true; });
+        try {
+            const response = await $api.post('/employee/login', {nickname, password});
+            localStorage.setItem('token', response.data.accessToken)
+            this.setEmployee(response.data.user)
+            this.setEmployeeAuth(true)
+            return { ok: true };
+
+        } catch (e) {
+            console.log('Ошибка входа:', e);
+            const axiosError = e as AxiosError;
+            const message = axiosError.response?.data?.message || 'Ошибка входа сотрудника';
+            return { ok: false, message };
+        } finally {
+            runInAction(() => { this.isLoading = false; });
+        }
+    }
+
+    async registrationEmployee(nickname: string, password: string, position: string, name: string){
+        try{
+            const response = await $api.post('/employee/registration', { nickname, password, position, name})
+            localStorage.setItem('token', response.data.accessToken)
+            this.setEmployee(response.data.user)
+            this.setEmployeeAuth(true)
+        }catch(e){
+            console.log('Ошибка регистрации:', e)
+        }
+    }
+
+    async logoutEmployee(){
+        try{
+            await $api.post('/employee/logout')
+        }catch(e){
+            console.log('Ошибка выхода:', e)
+        } finally {
+            localStorage.removeItem('token');
+            this.setEmployee({ id: '', name: '', nickname: '', position: '' });
+            this.setEmployeeAuth(false);
+        }
+    }
 }
+

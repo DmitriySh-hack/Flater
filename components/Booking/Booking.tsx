@@ -19,22 +19,35 @@ function formatDate(dateStr: string): string {
     return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+/** Функция проверки времени */
+function checkBookingFact(endDate: string) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(0, 0, 0, 0);
+    return end < today;
+}
+
 const Booking = observer(() => {
     const navigate = useNavigate();
     const { store } = useContext(Context);
     const [isLoading, setIsLoading] = useState(false);
 
     /** Список записей бронирования: одна карточка = один период дат. */
-    const entries = useMemo(() => store.booking, [store.booking]);
+    // const entries = useMemo(() => store.booking, [store.booking]);
+
+    const activeEntries = useMemo(() => 
+        store.booking.filter((entry) => !checkBookingFact(entry.endDate)), [store.booking]
+    );
 
     /** Итог к оплате: сумма по каждой записи (цена за день × количество ночей). */
     const totalSum = useMemo(() => {
-        return entries.reduce((sum, entry) => {
+        return activeEntries.reduce((sum, entry) => {
             const nights = nightsBetween(entry.startDate, entry.endDate);
             const price = entry.advertisement?.price ?? 0;
             return sum + price * nights;
         }, 0);
-    }, [entries]);
+    }, [activeEntries]);
 
     /** Удаление одного периода бронирования (одна карточка). */
     const handleRemoveEntry = async (entryId: number) => {
@@ -64,6 +77,10 @@ const Booking = observer(() => {
         };
         loadBookingAd();
     }, [store.isAuth]);
+
+    useEffect(() => {
+
+    }, [])
 
     if (isLoading) {
         return (
@@ -96,13 +113,13 @@ const Booking = observer(() => {
             </div>
             <div className="workPlace-container">
                 <div className="selectedAd-container">
-                    {entries.length === 0 ? (
+                    {activeEntries.length === 0 ? (
                         <p className="booking-empty">У вас пока нет бронирований. Выберите квартиру и даты в календаре.</p>
                     ) : (
-                        entries.map((entry: IBookingEntries) => {
+                        activeEntries.map((entry: IBookingEntries) => {
                             const ad = entry.advertisement;
                             const nights = nightsBetween(entry.startDate, entry.endDate);
-                            const periodSum = (ad?.price ?? 0) * nights;
+                            // const periodSum = (ad?.price ?? 0) * nights;
                             return (
                                 <div key={entry.id} className="booking-card">
                                     <div className="booking-card-main">
@@ -169,7 +186,7 @@ const Booking = observer(() => {
                 <div className="costAd-container">
                     <div className="costAd-set">
                         <h2 style={{ marginBottom: '5px' }}>К оплате:</h2>
-                        {entries.map((entry: IBookingEntries) => {
+                        {activeEntries.map((entry: IBookingEntries) => {
                             const ad = entry.advertisement;
                             const nights = nightsBetween(entry.startDate, entry.endDate);
                             const price = ad?.price ?? 0;

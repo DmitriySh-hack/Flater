@@ -80,3 +80,21 @@ CREATE TABLE booking_dates (
     end_date DATE NOT NULL, 
     created_at DATETIME DEFAULT GETDATE(),
 );
+CREATE TABLE dbo.[employee] (
+  id             NVARCHAR(50)  NOT NULL PRIMARY KEY,
+  name           NVARCHAR(255) NOT NULL,
+  nickname       NVARCHAR(255) NOT NULL UNIQUE,
+  password       NVARCHAR(255) NOT NULL,
+  position       NVARCHAR(255) NOT NULL, 
+  createdAt      DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+  updatedAt      DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+);
+
+CREATE TABLE dbo.[employee_tokens] (
+  id            INT IDENTITY(1,1) PRIMARY KEY,
+  employeeId    NVARCHAR(50) NOT NULL,
+  refreshToken  NVARCHAR(800) NOT NULL,
+  createdAt     DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+  CONSTRAINT FK_employee_tokens_employee
+    FOREIGN KEY (employeeId) REFERENCES dbo.[employee](id) ON DELETE CASCADE
+);
