@@ -11,6 +11,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const employeeControll = require('../employeeCRM/employee-controll.cjs');
+const { EMPLOYEE_POSITIONS } = require('../employeeCRM/employee-positions.cjs');
 
 // Создание директорий для загрузок
 const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
@@ -107,11 +108,19 @@ router.post(
     body('nickname').trim().isLength({ min: 2, max: 255 }),
     body('password').isLength({ min: 3, max: 64 }),
     body('name').trim().isLength({ min: 1, max: 255 }),
-    body('position').optional({ values: 'falsy' }).trim().isLength({ min: 1, max: 255 }),
+    body('position').optional({ values: 'falsy' }).trim().isIn(EMPLOYEE_POSITIONS),
     employeeControll.registrationEmployee
 );
 router.post('/employee/login', employeeControll.loginEmployee)
 router.post('/employee/logout', employeeControll.logout)
 router.get('/employee/refresh', employeeControll.refresh)
+router.get('/employee/positions', employeeControll.getPositions)
+router.patch(
+    '/employee/password',
+    body('nickname').trim().isLength({ min: 2, max: 255 }),
+    body('newPassword').isLength({ min: 3, max: 64 }),
+    employeeControll.changeEmployeePassword
+)
+router.get('/employee/all', employeeControll.getAllEmployees);
 
 module.exports = router;

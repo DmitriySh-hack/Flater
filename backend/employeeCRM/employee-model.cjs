@@ -53,6 +53,27 @@ const EmployeeModel = {
             return res.recordset[0] || null;
         }
         return null;
+    },
+
+    async updatePasswordByNickname(nickname, password) {
+        await query(
+            `UPDATE dbo.[employee] SET password = @password WHERE nickname = @nickname`,
+            [
+                { name: 'password', type: sql.NVarChar, value: password },
+                { name: 'nickname', type: sql.NVarChar, value: nickname },
+            ]
+        );
+
+        return await this.loginEmployee({ nickname });
+    },
+
+    async allEmployees(){
+        const res = await query(
+            `SELECT id, nickname, name, position, createdAt
+            FROM dbo.[employee] 
+            ORDER BY createdAt DESC`
+        )
+        return res.recordset;
     }
 }
 

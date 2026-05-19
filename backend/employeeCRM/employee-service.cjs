@@ -3,6 +3,10 @@ const employeeTokenService = require("./employee-token-service.cjs");
 const EmployeeDTO = require("./employee-dtos.cjs");
 const EmployeeModel = require("./employee-model.cjs");
 const bcrypt = require("bcrypt");
+const {
+    EMPLOYEE_POSITIONS,
+    DEFAULT_EMPLOYEE_POSITION,
+} = require("./employee-positions.cjs");
 
 class EmployeeService {
     async registerEmployee(name, nickname, password, position){
@@ -16,7 +20,10 @@ class EmployeeService {
         }
         const hashPassword = await bcrypt.hash(password, 3);
         const id = String(Date.now());
-        const pos = (position && String(position).trim()) || 'Сотрудник поддержки';
+        const pos = (position && String(position).trim()) || DEFAULT_EMPLOYEE_POSITION;
+        if (!EMPLOYEE_POSITIONS.includes(pos)) {
+            throw ApiError.BadRequest('Недопустимая должность');
+        }
         const displayName = String(name || '').trim() || nick;
         
         const user = await EmployeeModel.createEmployee({
@@ -26,15 +33,7 @@ class EmployeeService {
             password: hashPassword,
             position: pos,
         });
-        const userDTO = new EmployeeDTO(user);
-        const tokenPayload = { ...userDTO, role: 'employee' };
-        const tokens = employeeTokenService.generateTokens(tokenPayload)
-        await employeeTokenService.saveToken(userDTO.id, tokens.refreshToken)
-        
-        return {
-            ...tokens,
-            user: userDTO 
-        };
+        return new EmployeeDTO(user);
     }
 
     async loginEmployee(nickname, password){
@@ -121,6 +120,36 @@ class EmployeeService {
             console.error('❌ [EmployeeService.refresh] Error:', error.message);
             throw error;
         }
+    }
+
+    getAvailablePositions() {
+        return EMPLOYEE_POSITIONS;
+    }
+
+    async changeEmployeePassword(nickname, newPassword) {
+        const nick = String(nickname || '').trim();
+        const password = String(newPassword || '').trim();
+
+        if (!nick) {
+            throw ApiError.BadRequest('Укажите логин сотрудника');
+        }
+
+        if (!password) {
+            throw ApiError.BadRequest('Укажите новый пароль');
+        }
+
+        const user = await EmployeeModel.loginEmployee({ nickname: nick });
+        if (!user) {
+            throw ApiError.BadRequest('Сотрудник не найден');
+        }
+
+        const hashPassword = await bcrypt.hash(password, 3);
+        await EmployeeModel.updatePasswordByNickname(nick, hashPassword);
+        return true;
+    }
+    
+    async getAllEmployees(){
+        return await EmployeeModel.allEmployees();
     }
 }
 

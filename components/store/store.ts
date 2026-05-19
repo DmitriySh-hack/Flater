@@ -123,7 +123,9 @@ export default class Store {
 
     //CRM
     employee = {} as IEmployee
+    employees: { id: string; nickname: string; name: string; position: string }[] = [];
     isEmployee = false;
+    employeePositions: string[] = [];
 
     setEmployee(employee: IEmployee){
         return this.employee = employee;
@@ -131,6 +133,14 @@ export default class Store {
 
     setEmployeeAuth(value: boolean){
         this.isEmployee = value;
+    }
+
+    setEmployeePositions(positions: string[]) {
+        this.employeePositions = positions;
+    }
+
+    setEmployees(employees: { id: string; nickname: string; name: string; position: string }[]) {
+        this.employees = employees;
     }
 
     constructor() {
@@ -165,6 +175,8 @@ export default class Store {
     setCities(cities: string[]) {
         this.cities = cities;
     }
+
+    
 
     get userAdvertisment() {
         return this.advertisment.advertisments;
@@ -785,12 +797,26 @@ export default class Store {
 
     async registrationEmployee(nickname: string, password: string, position: string, name: string){
         try{
-            const response = await $api.post('/employee/registration', { nickname, password, position, name})
-            localStorage.setItem('token', response.data.accessToken)
-            this.setEmployee(response.data.user)
-            this.setEmployeeAuth(true)
+            await $api.post('/employee/registration', { nickname, password, position, name })
+            return { ok: true };
         }catch(e){
             console.log('Ошибка регистрации:', e)
+            const axiosError = e as AxiosError;
+            const message = axiosError.response?.data?.message || 'Ошибка регистрации сотрудника';
+            return { ok: false, message };
+        }
+    }
+
+    async fetchEmployeePositions() {
+        try {
+            const response = await $api.get('/employee/positions');
+            const positions = Array.isArray(response.data?.positions) ? response.data.positions : [];
+            this.setEmployeePositions(positions);
+            return positions;
+        } catch (e) {
+            console.log('Ошибка получения списка должностей:', e);
+            this.setEmployeePositions([]);
+            return [];
         }
     }
 
@@ -804,6 +830,23 @@ export default class Store {
             this.setEmployee({ id: '', name: '', nickname: '', position: '' });
             this.setEmployeeAuth(false);
         }
+    }
+
+    async changeEmployeePassword(nickname: string, newPassword: string){
+        try{
+            await $api.patch('/employee/password', { nickname, newPassword })
+            return { ok: true };
+        }catch(e){
+            console.log('Ошибка смены пароля сотрудника:', e);
+            const axiosError = e as AxiosError;
+            const message = axiosError.response?.data?.message || 'Ошибка смены пароля сотрудника';
+            return { ok: false, message };
+        }
+    }
+    
+    async fetchAllEmployees() {
+        const response = await $api.get('/employee/all');
+        this.setEmployees(response.data.employees ?? []);
     }
 }
 
