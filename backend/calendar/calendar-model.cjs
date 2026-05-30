@@ -1,11 +1,10 @@
 const { queryRaw } = require('msnodesqlv8');
 const { sql, query } = require('../db-mssql.cjs');
-const { validate } = require('uuid');
 
 class CalendarModel {
     async findById(id) {
         const res = await query(`SELECT * FROM booking_dates WHERE id = @id`,
-            [{ name: 'id', type: sql.NVarChar(255), value: id }]
+            [{ name: 'id', type: sql.Int, value: id }]
         );
         return res.recordset[0];
     }
@@ -71,6 +70,14 @@ class CalendarModel {
             {name: 'user_id', type: sql.NVarChar(255), value: userId }
         ]);
         return res.recordset || [];
+    }
+
+    async findAdvertisementIdsByUserId(userId) {
+        const res = await query(`
+            SELECT DISTINCT advertisement_id FROM booking_dates
+            WHERE user_id = @user_id
+        `, [{ name: 'user_id', type: sql.NVarChar(255), value: userId }]);
+        return (res.recordset || []).map((row) => row.advertisement_id);
     }
 
     async deleteById(id, userId){

@@ -1,8 +1,6 @@
 const BookingAdvertisementModel = require('./booking-model.cjs');
 const BookingAdvertisementDTO = require('./booking-dtos.cjs');
 
-// Нужно импортировать модель объявлений
-// Если у вас есть файл advertisment-model.cjs в другой директории:
 const path = require('path');
 const AdvertisementModel = require(path.join(__dirname, '..', 'advertisement', 'advertisment-model.cjs'));
 

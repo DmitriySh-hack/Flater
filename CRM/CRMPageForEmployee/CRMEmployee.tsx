@@ -1,9 +1,11 @@
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { Context } from '../../src/main';
 import { observer } from 'mobx-react-lite';
 
 export const CRMEmployee = observer(() => {
     const {store} = useContext(Context);
+    const navigate = useNavigate();
 
     const [selectedPosition, setSelectedPosition] = useState('');
 
@@ -79,6 +81,7 @@ export const CRMEmployee = observer(() => {
                         </div>
                     </div>
 
+                    <button onClick={() => navigate('/crmsys/orders')}>Все сделки</button>
                     <button onClick={handleCreateAccount}>Create account</button>
                     <button onClick={handleChangePasswordAccount}>Change employee password</button>
                     { createNewAccount && (

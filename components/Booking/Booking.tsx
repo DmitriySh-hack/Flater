@@ -4,6 +4,7 @@ import { Context } from '../../src/main';
 import { useContext, useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { IBookingEntries } from "../models/IBookingEntries";
+import OrderService from "../service/OrderService";
 
 /** Количество ночей между двумя датами (конец не включён: 1–3 янв = 2 ночи). */
 function nightsBetween(start: string, end: string): number {
@@ -32,6 +33,7 @@ const Booking = observer(() => {
     const navigate = useNavigate();
     const { store } = useContext(Context);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     /** Список записей бронирования: одна карточка = один период дат. */
     // const entries = useMemo(() => store.booking, [store.booking]);
@@ -78,9 +80,28 @@ const Booking = observer(() => {
         loadBookingAd();
     }, [store.isAuth]);
 
-    useEffect(() => {
-
-    }, [])
+    const handleCreateOrders = async () => {
+        if (activeEntries.length === 0) {
+            alert('Нет активных бронирований для оформления');
+            return;
+        }
+        if (!confirm(`Оформить ${activeEntries.length} заказ(ов) на сумму ${totalSum.toLocaleString('ru-RU')} ₽?`)) {
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            for (const entry of activeEntries) {
+                await OrderService.createOrder(entry.id);
+            }
+            await store.getBookingAdvertisement();
+            alert('Заказы успешно созданы');
+        } catch (e) {
+            console.error('Ошибка создания заказа:', e);
+            alert('Не удалось создать заказ. Возможно, он уже оформлен.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -107,7 +128,7 @@ const Booking = observer(() => {
     const getImageUrl = (path: string) => `http://localhost:5000${path}`;
 
     return (
-        <div className="main-container">
+        <div className="booking-page">
             <div className="name-container">
                 <h1>Бронирование</h1>
             </div>
@@ -208,7 +229,13 @@ const Booking = observer(() => {
                             </p>
                         </div>
                         <div className="booking-btn-container">
-                            <button className="booking-btn">Бронировать</button>
+                            <button
+                                className="booking-btn"
+                                onClick={handleCreateOrders}
+                                disabled={isSubmitting || activeEntries.length === 0}
+                            >
+                                {isSubmitting ? 'Оформление...' : 'Бронировать'}
+                            </button>
                         </div>
                     </div>
                 </div>

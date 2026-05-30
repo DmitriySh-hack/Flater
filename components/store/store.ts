@@ -15,6 +15,7 @@ interface AdvertismentState {
 
 interface AxiosError {
     response?: {
+        status?: number;
         data?: {
             message: string;
         };
@@ -324,9 +325,13 @@ export default class Store {
             this.setEmployee(response.data.user);
             this.setEmployeeAuth(true);
         } catch (e) {
-            localStorage.removeItem('token');
-            this.setEmployee({ id: '', name: '', nickname: '', position: '' });
-            this.setEmployeeAuth(false);
+            const status = (e as AxiosError).response?.status;
+            // Сбрасываем сессию только при явном отказе авторизации, не при обрыве сети
+            if (status === 401 || status === 403) {
+                localStorage.removeItem('token');
+                this.setEmployee({ id: '', name: '', nickname: '', position: '' });
+                this.setEmployeeAuth(false);
+            }
             throw e;
         }
     }
@@ -678,11 +683,10 @@ export default class Store {
     /** Статус «забронировано»: у пользователя есть хотя бы один период по этому объявлению. */
     async loadBookingStatus() {
         try {
-            const entries = await this.getBookingAdvertisement() as IBookingEntries[];
-            const validEntries = entries.filter(
-                (e): e is IBookingEntries => e && typeof e.advertisementId === 'string'
+            const response = await $api.get<string[]>('/booking/advertisement-ids');
+            const bookedAdIds = new Set(
+                Array.isArray(response.data) ? response.data : []
             );
-            const bookedAdIds = new Set(validEntries.map(e => e.advertisementId));
 
             const statuses: Record<string, boolean> = {};
             this.publicAdvertisements.forEach(ad => {

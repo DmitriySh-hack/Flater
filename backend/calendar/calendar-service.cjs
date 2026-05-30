@@ -1,5 +1,6 @@
 const CalendarModel = require('./calendar-model.cjs');
-const AdvertisementModel = require('../advertisement/advertisment-model.cjs')
+const AdvertisementModel = require('../advertisement/advertisment-model.cjs');
+const PaySystemModel = require('../paySystem/paySystem-model.cjs');
 const CalendarDTO = require('./calendar-dto.cjs');
 const ApiError = require('../exceptions/api-error.cjs');
 
@@ -32,9 +33,22 @@ class CalendarService {
         return await CalendarModel.deleteBookingByAdAndUser(adId, userId);
     }
 
-    async getUserBookingEntries(userId){
+    async getUserBookedAdvertisementIds(userId) {
+        return CalendarModel.findAdvertisementIdsByUserId(userId);
+    }
+
+    async getUserBookingEntries(userId, { excludeOrdered = false } = {}) {
         const rows = await CalendarModel.findByUserId(userId);
-        const entries = await Promise.all(rows.map(
+
+        let filteredRows = rows;
+        if (excludeOrdered) {
+            const orderedBookingIds = new Set(
+                await PaySystemModel.findBookingIdsByClientId(userId)
+            );
+            filteredRows = rows.filter((row) => !orderedBookingIds.has(row.id));
+        }
+
+        const entries = await Promise.all(filteredRows.map(
             async (row) => {
                 const ad = await AdvertisementModel.findById(row.advertisement_id);
                 if (!ad) return null;

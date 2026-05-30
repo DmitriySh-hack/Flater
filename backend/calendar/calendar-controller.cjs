@@ -55,8 +55,22 @@ class CalendarController {
             const userId = req.user?.id || req.user?.userId || req.user?._id;
             if (!userId) return res.status(401).json({ error: 'Пользователь не авторизован' });
 
-            const result = await CalendarService.getUserBookingEntries(userId);
+            const result = await CalendarService.getUserBookingEntries(userId, {
+                excludeOrdered: true,
+            });
             return res.json(result);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async getMyBookedAdvertisementIds(req, res, next) {
+        try {
+            const userId = req.user?.id || req.user?.userId || req.user?._id;
+            if (!userId) return res.status(401).json({ error: 'Пользователь не авторизован' });
+
+            const ids = await CalendarService.getUserBookedAdvertisementIds(userId);
+            return res.json(ids);
         } catch (e) {
             next(e);
         }

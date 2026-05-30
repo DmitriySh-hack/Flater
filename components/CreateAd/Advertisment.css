@@ -1,3 +1,14 @@
+.advertisment-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    box-sizing: border-box;
+}
+
 .advertisements-count{
     font-size: 18px;
 }
@@ -27,6 +38,15 @@
 
 .advertisement-container{
     margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.advertisment-page .your-ad{
+    text-align: center;
+    width: 100%;
 }
 
 .your-ad{

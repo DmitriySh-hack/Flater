@@ -18,6 +18,15 @@ export const CRMLayout = observer(function CRMLayout() {
       <header className="crm-platform__header">
         <span className="crm-platform__header-title" style={{cursor: 'pointer'}} onClick={() => navigate('/crmsys/main')}>CRM — Служба поддержки</span>
         <div style={{display: 'flex', flexDirection: 'row', gap: "25px", alignItems: 'center'}}>
+          {store.isEmployee && store.employee.position === 'super-admin' ? (
+            <button
+              type="button"
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate('/crmsys/orders')}
+            >
+              Сделки
+            </button>
+          ) : null}
           {store.isEmployee ? (
             <button type="button" style={{cursor: 'pointer'}} onClick={handleLogoutEmployee}>Выйти</button>
           ) : (

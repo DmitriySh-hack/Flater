@@ -7,7 +7,7 @@ const errorMiddleware = require('./middleware/error-middleware.cjs');
 const { getPool } = require('./db-mssql.cjs');
 const startWebSocket = require('./messages/websocket.cjs')
 
-const PORT = process.env.PORT || 5001
+const PORT = process.env.PORT || 5000
 
 const app = express();
 const path = require('path');

@@ -52,7 +52,7 @@ export const Advertisment = observer(() => {
 
     if(store.isAuth){
         return(
-            <div className='main-container'>
+            <div className='advertisment-page'>
                 <div className='advertisement-create-container'>
                     <div className='advertisements-count'>Список Ваших объявлений: {store.userAdvertisment.length}</div>
 

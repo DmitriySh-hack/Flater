@@ -98,3 +98,18 @@ CREATE TABLE dbo.[employee_tokens] (
   CONSTRAINT FK_employee_tokens_employee
     FOREIGN KEY (employeeId) REFERENCES dbo.[employee](id) ON DELETE CASCADE
 );
+
+CREATE TABLE orders (
+    id NVARCHAR(50) PRIMARY KEY,
+    booking_id INT NOT NULL,            
+    client_id NVARCHAR(50) NOT NULL,      
+    seller_id NVARCHAR(50) NOT NULL,      
+    advertisement_id NVARCHAR(255) NOT NULL,
+    price DECIMAL(18,2) NOT NULL,         
+    move_in_confirmed BIT NOT NULL DEFAULT 0,
+    hidden_from_profile BIT NOT NULL DEFAULT 0,
+    confirmed_at DATETIME2 NULL,
+    created_at DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (client_id) REFERENCES users(id),
+    FOREIGN KEY (seller_id) REFERENCES users(id)
+);

@@ -1,12 +1,12 @@
 .photo-container{
     width: 250px;
-    height: 250px;
+    min-height: 250px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: gray;
-    margin: 20px;
+    margin: 0;
     border-radius: 15px;
 }
 

@@ -12,6 +12,8 @@ const path = require('path');
 const fs = require('fs');
 const employeeControll = require('../employeeCRM/employee-controll.cjs');
 const { EMPLOYEE_POSITIONS } = require('../employeeCRM/employee-positions.cjs');
+const PaySystemController = require('../paySystem/paySystem-controller.cjs');
+const employeeSuperAdminMiddleware = require('../middleware/employee-super-admin-middleware.cjs');
 
 // Создание директорий для загрузок
 const uploadsDir = path.join(__dirname, '..', 'uploads', 'avatars');
@@ -100,6 +102,7 @@ router.post('/calendar/reserve', authMiddleware, CalendarController.createdBooki
 router.delete('/calendar/:adId', authMiddleware, CalendarController.deleteBooking);
 
 router.get('/booking/entries', authMiddleware, CalendarController.getBookingEntries);
+router.get('/booking/advertisement-ids', authMiddleware, CalendarController.getMyBookedAdvertisementIds);
 router.delete('/calendar/booking/:id', authMiddleware, CalendarController.deleteBookingEntries);
 
 //CRM-router
@@ -122,5 +125,12 @@ router.patch(
     employeeControll.changeEmployeePassword
 )
 router.get('/employee/all', employeeControll.getAllEmployees);
+
+router.post('/orders', authMiddleware, PaySystemController.createOrder);
+router.get('/orders/my', authMiddleware, PaySystemController.getMyOrders);
+router.put('/orders/:id/confirm-move-in', authMiddleware, PaySystemController.confirmMoveIn);
+router.patch('/orders/:id/hide-from-profile', authMiddleware, PaySystemController.hideFromProfile);
+router.get('/orders/all', authMiddleware, employeeSuperAdminMiddleware, PaySystemController.getAllOrders);
+router.get('/orders/export', authMiddleware, PaySystemController.exportExcel);
 
 module.exports = router;
